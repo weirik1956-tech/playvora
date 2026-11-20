@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Community | PLAYVORA</title>
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/games.js"></script>
+<script src="js/bell.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:980px}
+.top a:not(.btn):not(.ps-bell){color:var(--mute);font-size:14px}.top a:not(.btn):not(.ps-bell):hover{color:var(--cream)}
+.top .sp{flex:1}
+.logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)!important}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+h1{font:800 36px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:26px 0 4px}
+.lead{color:var(--mute);margin:0 0 18px}
+.btn{display:inline-block;border:0;border-radius:10px;padding:10px 18px;background:var(--accent);color:var(--on-accent);font:700 14px "DM Sans",sans-serif;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--accent-d)}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.sm{padding:7px 14px;font-size:13px}
+.btn:disabled{opacity:.6;cursor:wait}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+textarea,input,select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:11px 14px;font:inherit;font-size:15px}
+textarea{min-height:84px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row select{width:auto;flex:1;min-width:140px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 16px}
+.chip{background:var(--panel);color:var(--cream);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font:600 14px "DM Sans",sans-serif;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.post .h{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.av{width:38px;height:38px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:800;flex:none}
+.post .h b a:hover{text-decoration:underline}
+.post .h small{color:var(--mute)}
+.tag{font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;background:var(--panel2);border:1px solid var(--line);color:var(--mute)}
+.post .body{white-space:pre-wrap;word-wrap:break-word;margin:0 0 10px}
+.acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.act{background:none;border:0;color:var(--mute);font:600 14px "DM Sans",sans-serif;cursor:pointer;padding:6px 10px;border-radius:8px}
+.act:hover{background:var(--panel2);color:var(--cream)}
+.act[aria-pressed=true]{color:var(--accent)}
+.act.r{margin-left:auto;font-weight:500;font-size:13px}
+.cm{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.c{padding:8px 0}
+.c.reply{margin-left:28px;padding-left:12px;border-left:2px solid var(--line)}
+.c .ch{font-size:13px;color:var(--mute)}
+.c .ch b a{color:var(--cream)}.c .ch b a:hover{text-decoration:underline}
+.c p{margin:2px 0;white-space:pre-wrap;word-wrap:break-word;font-size:15px}
+.c .ca button{background:none;border:0;color:var(--mute);font-size:12px;cursor:pointer;padding:2px 8px 2px 0}
+.c .ca button:hover{color:var(--cream)}
+.cf{display:flex;gap:8px;margin-top:8px}
+.cf input{flex:1}
+.rt{font-size:13px;color:var(--mute);margin-top:6px}
+.rt button{background:none;border:0;color:var(--accent);cursor:pointer;font-size:13px;text-decoration:underline}
+.msg{min-height:1.3em;margin:8px 0 0;font-size:14px;color:var(--mute)}.msg.bad{color:var(--accent)}
+.empty{color:var(--mute);text-align:center;padding:30px 0}
+.note{background:var(--panel2);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--mute);margin-bottom:16px}
+.note a{color:var(--accent);text-decoration:underline}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:980px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a>
+  <a href="index.html#explore">Explore</a><a href="challenges.html">Challenges</a><a href="leaderboard.html">Leaderboard</a>
+  <span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+  <a class="btn sm" id="who" data-base="" href="login.html">Sign in</a>
+</div></header>
+
+<main class="wrap">
+  <h1>Community</h1>
+  <p class="lead">Share tips, ask questions and recommend games to other players.</p>
+  <div class="note" id="setup" hidden>The community is not set up yet. Run <b>supabase-community.sql</b> in your Supabase SQL Editor, then refresh.</div>
+
+  <div class="card" id="compose">
+    <div class="row" style="margin-bottom:10px">
+      <select id="kind" aria-label="Type of post"><option value="post">Post</option><option value="tip">Tip</option><option value="question">Question</option><option value="recommendation">Recommendation</option></select>
+      <select id="game" aria-label="Game this is about"><option value="">No specific game</option></select>
+    </div>
+    <textarea id="text" maxlength="500" placeholder="What's on your mind?" aria-label="Write a post"></textarea>
+    <div class="row" style="margin-top:10px"><button class="btn" id="send">Post</button><span id="cnt" style="color:var(--mute);font-size:13px">0 / 500</span></div>
+    <p class="msg" id="msg" role="status"></p>
+  </div>
+  <div class="note" id="guest" hidden><a href="login.html?next=community.html">Sign in</a> to post, comment and like.</div>
+
+  <div class="chips" id="chips" role="group" aria-label="Filter posts"></div>
+  <p class="rt" id="filt" hidden></p>
+  <div id="feed"></div>
+  <p style="text-align:center"><button class="btn alt" id="more" hidden>Load more</button></p>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA</span><span><a href="terms.html">Terms</a> &middot; <a href="privacy.html">Privacy</a></span></div></footer>
+
+<script>
+const $=id=>document.getElementById(id),qs=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const KINDS={all:"All",post:"Posts",tip:"Tips",question:"Questions",recommendation:"Recommendations"};
+const KIND_LABEL={post:"Post",tip:"Tip",question:"Question",recommendation:"Recommendation"};
+const PAGE=15,P=new URLSearchParams(location.search);
+const GAMES=psCatalog(),slug=psSlug,gname=k=>{const g=GAMES.find(x=>slug(x.n)===k);return g?g.n:k};
+let uid=null,isAdmin=false,kind="all",gameF=P.get("game")||"",focus=+P.get("post")||0,offset=0,liked=new Set();
+$("tt").onclick=()=>PS.toggle();
+function say(t,bad){$("msg").textContent=t;$("msg").className="msg"+(bad?" bad":"")}
+function ago(t){const s=(Date.now()-new Date(t))/1000;if(s<60)return"just now";if(s<3600)return Math.floor(s/60)+" min ago";if(s<86400)return Math.floor(s/3600)+" h ago";if(s<604800)return Math.floor(s/86400)+" d ago";return new Date(t).toLocaleDateString()}
+const cnt=x=>x&&x[0]?x[0].count:0;
+
+$("game").innerHTML+=GAMES.map(g=>'<option value="'+slug(g.n)+'">'+g.n+'</option>').join("");
+if(gameF&&GAMES.some(g=>slug(g.n)===gameF))$("game").value=gameF;
+$("chips").innerHTML=Object.keys(KINDS).map(k=>'<button class="chip" data-k="'+k+'" aria-pressed="'+(k===kind)+'">'+KINDS[k]+'</button>').join("");
+$("text").oninput=e=>{$("cnt").textContent=e.target.value.length+" / 500"};
+function filtNote(){
+  const el=$("filt");
+  if(focus){el.hidden=false;el.innerHTML='Showing one post. <button data-clear="1">Show all posts</button>'}
+  else if(gameF){el.hidden=false;el.innerHTML='Posts about <b>'+esc(gname(gameF))+'</b>. <button data-clear="1">Show all posts</button>'}
+  else el.hidden=true}
+
+function postHtml(p){
+  const u=p.profiles&&p.profiles.username||"player",lk=cnt(p.likes),cm=cnt(p.comments),on=liked.has(p.id);
+  return '<article class="card post" id="p'+p.id+'" data-id="'+p.id+'"><div class="h"><div class="av" aria-hidden="true">'+esc(u[0].toUpperCase())+'</div><div><b><a href="player.html?u='+encodeURIComponent(u)+'">'+esc(u)+'</a></b><br><small>'+ago(p.created_at)+'</small></div>'
+   +'<span class="tag">'+KIND_LABEL[p.kind]+'</span>'+(p.game?'<a class="tag" href="game.html?g='+esc(p.game)+'">'+esc(gname(p.game))+'</a>':"")+'</div>'
+   +'<p class="body">'+esc(p.body)+'</p>'
+   +'<div class="acts"><button class="act" data-like="'+p.id+'" aria-pressed="'+on+'" aria-label="Like">'+(on?"\u2665":"\u2661")+' <span>'+lk+'</span></button>'
+   +'<button class="act" data-cm="'+p.id+'">\u{1F4AC} '+cm+'</button>'
+   +(uid&&p.user_id!==uid?'<button class="act r" data-rep="post:'+p.id+'">Report</button>':"")
+   +(uid&&(p.user_id===uid||isAdmin)?'<button class="act r" data-del="posts:'+p.id+'">Delete</button>':"")
+   +'</div><div class="cm" hidden></div></article>'}
+
+async function load(reset){
+  if(reset){offset=0;$("feed").innerHTML="";liked=new Set()}
+  filtNote();
+  let q=psdb.from("posts").select("id,user_id,kind,game,body,created_at,profiles(username),likes(count),comments(count)").order("created_at",{ascending:false});
+  if(focus)q=q.eq("id",focus);else{q=q.range(offset,offset+PAGE-1);if(kind!=="all")q=q.eq("kind",kind);if(gameF)q=q.eq("game",gameF)}
+  const r=await q;
+  if(r.error){$("feed").innerHTML="";$("setup").hidden=false;$("compose").hidden=true;return}
+  const list=r.data||[];
+  if(uid&&list.length){const l=await psdb.from("likes").select("post_id").eq("user_id",uid).in("post_id",list.map(x=>x.id));(l.data||[]).forEach(x=>liked.add(x.post_id))}
+  $("feed").insertAdjacentHTML("beforeend",list.map(postHtml).join(""));
+  if(reset&&!list.length)$("feed").innerHTML='<p class="empty">Nothing here yet. Be the first to post!</p>';
+  $("more").hidden=focus||list.length<PAGE;offset+=list.length;
+  if(focus&&list.length)toggleComments(focus)}
+
+async function toggleComments(id){
+  const box=qs("#p"+id+" .cm");if(!box)return;
+  if(!box.hidden&&!focus){box.hidden=true;return}
+  box.hidden=false;box.innerHTML='<p class="rt">Loading...</p>';
+  const r=await psdb.from("comments").select("id,user_id,parent_id,body,created_at,profiles(username)").eq("post_id",id).order("created_at");
+  const list=r.data||[],top=list.filter(c=>!c.parent_id);
+  const one=(c,reply)=>{const u=c.profiles&&c.profiles.username||"player";
+    return '<div class="c'+(reply?" reply":"")+'"><div class="ch"><b><a href="player.html?u='+encodeURIComponent(u)+'">'+esc(u)+'</a></b> \u00b7 '+ago(c.created_at)+'</div><p>'+esc(c.body)+'</p><div class="ca">'
+      +(uid&&!reply?'<button data-reply="'+c.id+'" data-who="'+esc(u)+'">Reply</button>':"")
+      +(uid&&c.user_id!==uid?'<button data-rep="comment:'+c.id+'">Report</button>':"")
+      +(uid&&(c.user_id===uid||isAdmin)?'<button data-del="comments:'+c.id+'">Delete</button>':"")+'</div></div>'};
+  box.innerHTML=(top.length?top.map(c=>one(c,false)+list.filter(x=>x.parent_id===c.id).map(x=>one(x,true)).join("")).join(""):'<p class="rt">No comments yet.</p>')
+    +(uid?'<div class="cf"><input maxlength="300" placeholder="Write a comment" aria-label="Write a comment" data-input="'+id+'"><button class="btn sm" data-send="'+id+'">Send</button></div><p class="rt" data-replyto="'+id+'" hidden></p>':'<p class="rt"><a href="login.html?next=community.html" style="color:var(--accent);text-decoration:underline">Sign in</a> to comment.</p>')}
+
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("button");if(!b)return;
+  const d=b.dataset;
+  if(d.k){kind=d.k;focus=0;document.querySelectorAll("#chips .chip").forEach(c=>c.setAttribute("aria-pressed",String(c.dataset.k===kind)));load(true)}
+  else if(d.clear){focus=0;gameF="";history.replaceState(null,"","community.html");load(true)}
+  else if(b.id==="more"){load(false)}
+  else if(d.cm){toggleComments(d.cm)}
+  else if(d.like){
+    if(!uid){location.href="login.html?next=community.html";return}
+    const id=+d.like,on=liked.has(id),sp=b.querySelector("span");
+    on?liked.delete(id):liked.add(id);b.setAttribute("aria-pressed",String(!on));b.firstChild.textContent=(!on?"\u2665":"\u2661")+" ";sp.textContent=+sp.textContent+(on?-1:1);
+    const r=on?await psdb.from("likes").delete().eq("user_id",uid).eq("post_id",id):await psdb.from("likes").insert({user_id:uid,post_id:id});
+    if(r.error){on?liked.add(id):liked.delete(id);b.setAttribute("aria-pressed",String(on));b.firstChild.textContent=(on?"\u2665":"\u2661")+" ";sp.textContent=+sp.textContent+(on?1:-1)}}
+  else if(d.del){
+    if(!confirm("Delete this? This cannot be undone."))return;
+    const [tb,id]=d.del.split(":");if(!["posts","comments"].includes(tb))return;
+    const r=await psdb.from(tb).delete().eq("id",id);
+    if(r.error){alert(r.error.message);return}
+    if(tb==="posts")qs("#p"+id).remove();else{const pid=b.closest(".post").dataset.id,box=b.closest(".cm"),c=qs('[data-cm="'+pid+'"]');c.textContent="\u{1F4AC} "+Math.max(0,parseInt(c.textContent.replace(/\D/g,""))-1);box.hidden=true;toggleComments(pid)}}
+  else if(d.rep){
+    const why=prompt("Why are you reporting this? (a few words)");if(!why||why.trim().length<3)return;
+    const [k,id]=d.rep.split(":");
+    const r=await psdb.from("reports").insert({reporter:uid,kind:k,target:id,reason:why.trim().slice(0,300)});
+    b.textContent=r.error?(r.error.code==="23505"?"Already reported":"Could not report"):"Reported";b.disabled=true}
+  else if(d.reply){
+    const box=b.closest(".cm"),inp=box.querySelector("[data-input]"),note=box.querySelector("[data-replyto]");
+    inp.dataset.parent=d.reply;note.hidden=false;note.innerHTML='Replying to @'+esc(d.who)+'. <button data-cancel="1">Cancel</button>';inp.focus()}
+  else if(d.cancel){const box=b.closest(".cm");delete box.querySelector("[data-input]").dataset.parent;b.parentNode.hidden=true}
+  else if(d.send){
+    const box=b.closest(".cm"),inp=box.querySelector("[data-input]"),text=inp.value.trim();
+    if(!text)return;b.disabled=true;
+    const row={user_id:uid,post_id:+d.send,body:text};if(inp.dataset.parent)row.parent_id=+inp.dataset.parent;
+    const r=await psdb.from("comments").insert(row);b.disabled=false;
+    if(r.error){alert(r.error.message);return}
+    const c=qs('[data-cm="'+d.send+'"]');c.textContent="\u{1F4AC} "+(parseInt(c.textContent.replace(/\D/g,""))+1);
+    box.hidden=true;toggleComments(d.send)}});
+
+$("send").onclick=async()=>{
+  const body=$("text").value.trim();if(!body)return say("Write something first.",1);
+  $("send").disabled=true;
+  const r=await psdb.from("posts").insert({user_id:uid,kind:$("kind").value,game:$("game").value||null,body});
+  $("send").disabled=false;
+  if(r.error)return say(r.error.message,1);
+  $("text").value="";$("cnt").textContent="0 / 500";say("Posted!");focus=0;load(true)};
+
+(async()=>{
+  if(!window.psdb){$("guest").textContent="Could not reach PLAYVORA. Check your connection and refresh.";$("guest").hidden=false;$("compose").hidden=true;return}
+  PSAuth.nav($("who"));
+  const u=await PSAuth.user();uid=u?u.id:null;
+  $("compose").hidden=!uid;$("guest").hidden=!!uid;
+  if(uid){const p=await PSAuth.profile();isAdmin=!!(p&&p.is_admin)}
+  load(true)})();
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily challenges | PLAYVORA</title>
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14;--teal:#2ee6c5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:980px}
+.top a:not(.btn){color:var(--mute);font-size:14px}.top a:not(.btn):hover{color:var(--cream)}
+.top .sp{flex:1}
+.logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)!important}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+h1{font:800 36px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:26px 0 6px}
+.lead{color:var(--mute);margin:0 0 20px}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--mute)}
+.pill b{color:var(--cream)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px}
+.card h2{margin:0;font:800 20px "Bricolage Grotesque","Segoe UI",sans-serif}
+.card p{margin:2px 0 0;color:var(--mute);font-size:14px}
+.ch{display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:center}
+.bar{grid-column:1/-1;height:10px;background:var(--panel2);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+.card.done .bar i{background:var(--teal)}
+.cnt{grid-column:1/-1;font-size:13px;color:var(--mute);margin-top:-2px}
+.btn{display:inline-block;border:0;border-radius:10px;padding:10px 18px;background:var(--accent);color:var(--on-accent);font:700 14px "DM Sans",sans-serif;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--accent-d)}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.sm{padding:8px 16px}
+.btn:disabled{opacity:.6;cursor:default}
+.xp{color:var(--teal);font-weight:700}
+.lvl .bar{margin-top:10px}
+.msg{min-height:1.3em;font-size:14px;color:var(--mute);margin:6px 0 0}.msg.bad{color:var(--accent)}
+.note{background:var(--panel2);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--mute);margin-bottom:14px}
+.note a{color:var(--accent);text-decoration:underline}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:980px}
+</style>
+<script src="js/bell.js" defer></script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a>
+  <a href="index.html#explore">Explore</a><a href="leaderboard.html">Leaderboard</a><a href="settings.html">Settings</a>
+  <span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+  <a class="btn sm" id="who" data-base="" href="login.html">Sign in</a>
+</div></header>
+
+<main class="wrap">
+  <h1>Daily challenges</h1>
+  <p class="lead">Three new challenges every day. Finish them to earn XP and level up.</p>
+  <div class="meta"><span class="pill" id="cd"></span><span class="pill" id="streak" hidden></span></div>
+
+  <div class="note" id="guest" hidden><a href="login.html?next=challenges.html">Sign in</a> to track your progress and claim rewards.</div>
+  <div class="note" id="setup" hidden>Daily challenges are not set up yet. Run <b>supabase-challenges.sql</b> in your Supabase SQL Editor, then refresh.</div>
+
+  <div class="card lvl" id="lvl" hidden>
+    <h2>Level <span id="lv"></span></h2>
+    <div class="bar"><i id="xpb"></i></div>
+    <p id="xpt"></p>
+  </div>
+
+  <div id="list"></div>
+  <p class="msg" id="msg" role="status"></p>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA</span><span>Discover. Play. Compete.</span></div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let uid=null;
+$("tt").onclick=()=>PS.toggle();
+
+function say(t,bad){$("msg").textContent=t;$("msg").className="msg"+(bad?" bad":"")}
+function tick(){
+  const n=new Date(),ms=Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate()+1)-n;
+  $("cd").innerHTML="New challenges in <b>"+Math.floor(ms/36e5)+"h "+Math.floor(ms%36e5/6e4)+"m</b>"}
+function streakOf(days){
+  const set=new Set(days),f=x=>x.toISOString().slice(0,10);
+  let d=new Date();if(!set.has(f(d)))d=new Date(d-864e5);
+  let n=0;while(set.has(f(d))){n++;d=new Date(d-864e5)}return n}
+
+async function loadMe(){
+  const p=await psdb.from("profiles").select("xp,level").eq("id",uid).maybeSingle();
+  if(p.data&&p.data.xp!=null){
+    const into=p.data.xp%200;
+    $("lv").textContent=p.data.level;$("xpb").style.width=(into/2)+"%";
+    $("xpt").textContent=into+" of 200 XP to level "+(p.data.level+1);$("lvl").hidden=false}
+  const c=await psdb.from("challenge_claims").select("day").order("day",{ascending:false}).limit(60);
+  if(c.data){const n=streakOf(c.data.map(r=>r.day));
+    if(n>0){$("streak").innerHTML="<b>"+n+"</b>-day streak";$("streak").hidden=false}}}
+
+function card(c){
+  const pct=Math.round(100*c.progress/c.target),done=c.progress>=c.target;
+  let act;
+  if(c.claimed)act='<button class="btn alt sm" disabled>Claimed</button>';
+  else if(done&&uid)act='<button class="btn sm" data-id="'+esc(c.id)+'">Claim +'+c.xp+' XP</button>';
+  else act='<a class="btn alt sm" href="index.html#explore">Play now</a>';
+  return '<div class="card ch'+(done?" done":"")+'"><div><h2>'+esc(c.title)+'</h2><p>'+esc(c.description)+' &middot; <span class="xp">+'+c.xp+' XP</span></p></div><div>'+act+'</div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="cnt">'+c.progress+' / '+c.target+'</div></div>'}
+
+async function load(){
+  if(!window.psdb){say("Could not reach PLAYVORA. Check your connection and refresh.",1);return}
+  const r=await psdb.rpc("my_challenges");
+  if(r.error){$("setup").hidden=false;return}
+  $("list").innerHTML=r.data.map(card).join("")}
+
+$("list").onclick=async e=>{
+  const id=e.target.dataset.id;if(!id)return;
+  e.target.disabled=true;
+  const r=await psdb.rpc("claim_challenge",{p_id:id});
+  if(r.error){say(r.error.message,1);e.target.disabled=false;return}
+  say("Challenge complete! +"+r.data+" XP");
+  await load();await loadMe()};
+
+(async()=>{
+  tick();setInterval(tick,30000);
+  if(window.psdb){await PSAuth.nav($("who"));const u=await PSAuth.user();uid=u?u.id:null}
+  $("guest").hidden=!!uid;
+  await load();
+  if(uid)await loadMe()})();
+</script>
+</body>
+</html>

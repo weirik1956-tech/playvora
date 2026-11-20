@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notifications | PLAYVORA</title>
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/bell.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:980px}
+.top a:not(.btn):not(.ps-bell){color:var(--mute);font-size:14px}.top a:not(.btn):not(.ps-bell):hover{color:var(--cream)}
+.top .sp{flex:1}
+.logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)!important}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+h1{font:800 36px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:26px 0 14px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.bar .sp{flex:1}
+.chip{background:var(--panel);color:var(--cream);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font:600 14px "DM Sans",sans-serif;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.btn{display:inline-block;border:0;border-radius:10px;padding:9px 16px;background:var(--accent);color:var(--on-accent);font:700 14px "DM Sans",sans-serif;cursor:pointer}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.alt:hover{border-color:var(--mute)}
+.list{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.n{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-top:1px solid var(--line);cursor:pointer;position:relative}
+.n:first-child{border-top:0}
+.n:hover{background:var(--panel2)}
+.n.unread{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.n.unread::before{content:"";position:absolute;left:5px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--accent)}
+.ic{width:38px;height:38px;border-radius:50%;background:var(--panel2);display:grid;place-items:center;flex:none;font-size:18px}
+.tx{flex:1;min-width:0}
+.tx b{display:block}
+.tx span{display:block;color:var(--mute);font-size:14px}
+.tx small{color:var(--mute);font-size:12px}
+.x{background:none;border:0;color:var(--mute);font-size:20px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:8px}
+.x:hover{color:var(--cream);background:var(--panel2)}
+.empty{padding:34px 16px;text-align:center;color:var(--mute)}
+.note{background:var(--panel2);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--mute);margin-bottom:16px}
+.note a{color:var(--accent);text-decoration:underline}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:980px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a>
+  <a href="index.html#explore">Explore</a><a href="challenges.html">Challenges</a><a href="leaderboard.html">Leaderboard</a>
+  <span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+  <a class="btn" id="who" data-base="" href="login.html">Sign in</a>
+</div></header>
+
+<main class="wrap">
+  <h1>Notifications</h1>
+  <div class="note" id="guest" hidden><a href="login.html?next=notifications.html">Sign in</a> to see your notifications.</div>
+  <div class="note" id="setup" hidden>Notifications are not set up yet. Run <b>supabase-notifications.sql</b> in your Supabase SQL Editor, then refresh.</div>
+  <div id="app" hidden>
+    <div class="bar" id="chips" role="group" aria-label="Filter notifications"></div>
+    <div class="bar"><button class="btn alt" id="readall">Mark all as read</button><button class="btn alt" id="clear">Clear all</button><span class="sp"></span><span style="color:var(--mute);font-size:14px" id="count"></span></div>
+    <div class="list" id="list"></div>
+  </div>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA</span><span>Discover. Play. Compete.</span></div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const GROUPS={all:["All",null],friends:["Friends",["friend_request","friend_accepted"]],achievements:["Achievements",["achievement"]],rewards:["Rewards & levels",["challenge","reward","level_up"]],community:["Community",["comment","reaction"]],news:["Announcements",["announcement"]]};
+const ICON={friend_request:"\u{1F464}",friend_accepted:"\u{1F91D}",achievement:"\u{1F3C6}",challenge:"\u{1F3AF}",reward:"\u2B50",level_up:"\u{1F680}",announcement:"\u{1F4E2}",comment:"\u{1F4AC}",reaction:"\u2764\uFE0F"};
+let uid=null,items=[],group="all";
+$("tt").onclick=()=>PS.toggle();
+$("chips").innerHTML=Object.keys(GROUPS).map(k=>'<button class="chip" data-g="'+k+'" aria-pressed="'+(k===group)+'">'+GROUPS[k][0]+'</button>').join("");
+const changed=()=>window.dispatchEvent(new Event("ps-notifications-changed"));
+function ago(t){
+  const s=Math.max(0,(Date.now()-new Date(t))/1000);
+  if(s<60)return"just now";if(s<3600)return Math.floor(s/60)+" min ago";
+  if(s<86400)return Math.floor(s/3600)+" h ago";if(s<604800)return Math.floor(s/86400)+" d ago";
+  return new Date(t).toLocaleDateString()}
+function render(){
+  const g=GROUPS[group][1],list=g?items.filter(n=>g.includes(n.kind)):items;
+  const unread=items.filter(n=>!n.is_read).length;
+  $("count").textContent=unread?unread+" unread":"All caught up";
+  $("list").innerHTML=list.length?list.map(n=>'<div class="n'+(n.is_read?"":" unread")+'" data-id="'+n.id+'" tabindex="0" role="link"><div class="ic" aria-hidden="true">'+(ICON[n.kind]||"\u{1F514}")+'</div><div class="tx"><b>'+esc(n.title)+'</b>'+(n.body?'<span>'+esc(n.body)+'</span>':"")+'<small>'+ago(n.created_at)+'</small></div><button class="x" data-del="'+n.id+'" aria-label="Delete notification">&times;</button></div>').join(""):'<div class="empty">Nothing here yet.</div>';
+  qa(".chip").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.g===group)))}
+function qa(s){return[...document.querySelectorAll(s)]}
+async function load(){
+  const r=await psdb.from("notifications").select("id,kind,title,body,link,is_read,created_at").order("created_at",{ascending:false}).limit(100);
+  if(r.error){$("app").hidden=true;$("setup").hidden=false;return}
+  items=r.data||[];$("app").hidden=false;render()}
+$("chips").onclick=e=>{if(e.target.dataset.g){group=e.target.dataset.g;render()}};
+async function open(id){
+  const n=items.find(x=>x.id==id);if(!n)return;
+  if(!n.is_read){n.is_read=true;render();await psdb.from("notifications").update({is_read:true}).eq("id",id);changed()}
+  if(n.link&&/^[\w-]+\.html(\?[\w=&%.-]*)?$/.test(n.link))location.href=n.link}
+$("list").onclick=async e=>{
+  const d=e.target.closest("[data-del]");
+  if(d){items=items.filter(x=>x.id!=d.dataset.del);render();await psdb.from("notifications").delete().eq("id",d.dataset.del);changed();return}
+  const row=e.target.closest(".n");if(row)open(row.dataset.id)};
+$("list").onkeydown=e=>{if(e.key==="Enter"&&e.target.classList.contains("n"))open(e.target.dataset.id)};
+$("readall").onclick=async()=>{
+  items.forEach(n=>n.is_read=true);render();
+  await psdb.from("notifications").update({is_read:true}).eq("is_read",false);changed()};
+$("clear").onclick=async()=>{
+  if(!items.length||!confirm("Delete all your notifications?"))return;
+  items=[];render();await psdb.from("notifications").delete().eq("user_id",uid);changed()};
+
+(async()=>{
+  if(!window.psdb){$("guest").textContent="Could not reach PLAYVORA. Check your connection and refresh.";$("guest").hidden=false;return}
+  PSAuth.nav($("who"));
+  const u=await PSAuth.user();
+  if(!u){$("guest").hidden=false;return}
+  uid=u.id;load()})();
+</script>
+</body>
+</html>

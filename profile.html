@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:1000px}
+.top a{color:var(--mute);font-size:14px}
+.top a:hover{color:var(--cream)}
+.top a.btn{color:var(--on-accent)}
+.top .sp{flex:1}
+.top .logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+h1{font:800 36px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:26px 0 6px}
+.lead{color:var(--mute);margin:0 0 22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.card h2{margin:0 0 14px;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--mute)}
+label{display:block;font-size:14px;color:var(--mute);margin-bottom:6px}
+input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:12px 14px;font:inherit}
+.field{margin-bottom:14px}
+.btn{display:inline-block;border:0;border-radius:10px;padding:11px 20px;background:var(--accent);color:var(--on-accent);font:700 15px "DM Sans",sans-serif;cursor:pointer}
+.btn:hover{background:var(--accent-d)}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.alt:hover{border-color:var(--mute)}
+.btn.sm{padding:8px 16px;font-size:14px}
+.btn.full{width:100%}
+.seg{display:flex;gap:8px;margin-bottom:18px}
+.seg button{flex:1;background:var(--panel2);color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:10px;font:600 14px "DM Sans",sans-serif;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.msg{min-height:1.4em;font-size:14px;margin:12px 0 0;color:var(--mute)}
+.msg.err{color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--panel2);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font:800 28px "Bricolage Grotesque","Segoe UI",sans-serif}
+.stat span{color:var(--mute);font-size:13px}
+.av{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 24px "Bricolage Grotesque","Segoe UI",sans-serif}
+.who{display:flex;gap:16px;align-items:center}
+.who h2{margin:0;font:800 24px "Bricolage Grotesque","Segoe UI",sans-serif;text-transform:none;letter-spacing:0;color:var(--cream)}
+.who p{margin:0;color:var(--mute);font-size:14px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:500;font-size:13px}
+tr.me td{background:var(--panel2);font-weight:700}
+.empty{color:var(--mute);padding:18px 0}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+.bar{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;margin-top:10px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+.ach{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:12px}
+.ach div{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.ach div.off{opacity:.55}.ach b{display:block}.ach small{color:var(--mute)}
+</style>
+<title>Profile | PLAYVORA</title>
+<script src="js/bell.js" defer></script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a>
+  <a href="index.html#explore">Explore</a><a href="leaderboard.html">Leaderboard</a><a href="settings.html">Settings</a>
+  <span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+  <a class="btn sm" id="who" href="login.html">Sign in</a>
+</div></header>
+<main class="wrap">
+  <h1>Profile</h1>
+  <p class="lead" id="lead">Loading your profile...</p>
+  <div id="content" hidden>
+    <div class="card who"><div class="av" id="av"></div><div><h2 id="un"></h2><p id="meta"></p></div></div>
+    <div class="card" id="lvcard" hidden>
+      <h2>Level <span id="lv"></span></h2>
+      <div class="bar"><i id="xpb"></i></div>
+      <p id="xpt" style="color:var(--mute);font-size:14px;margin:8px 0 0"></p>
+    </div>
+    <div class="card" id="achcard" hidden>
+      <h2>Achievements</h2>
+      <div class="ach" id="ach"></div>
+    </div>
+    <div class="card">
+      <h2>Best scores</h2>
+      <div class="stats" id="scores"></div>
+    </div>
+    <div class="card">
+      <h2>Change username</h2>
+      <div class="field"><label for="nu">New username</label><input id="nu" maxlength="20" placeholder="3-20 letters, numbers or _"></div>
+      <button class="btn sm" id="save">Save username</button>
+      <p class="msg" id="msg" role="status"></p>
+    </div>
+    <p style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn alt sm" href="settings.html">Settings</a><a class="btn alt sm" id="adm" href="admin.html" hidden>Admin</a><button class="btn alt sm" id="out">Sign out</button></p>
+  </div>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA &middot; Discover. Play. Compete.</span><a href="index.html">Home</a></div></footer>
+<script src="js/common.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+function say(t,err){$("msg").textContent=t;$("msg").className="msg"+(err?" err":"")}
+(async()=>{
+  const p=await PSDB.profile();
+  if(!p){location.replace("login.html?next=profile.html");return}
+  $("lead").textContent="Your account and scores.";
+  $("content").hidden=false;
+  $("un").textContent=p.username;$("av").textContent=p.username[0].toUpperCase();
+  $("meta").textContent=p.email+" \u00b7 Joined "+new Date(p.created_at).toLocaleDateString();
+  $("adm").hidden=!p.is_admin;
+  {const a=document.createElement("a");a.href="player.html?u="+encodeURIComponent(p.username);a.className="btn alt";a.textContent="View public profile";a.style.marginRight="10px";$("out").before(a)}
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const sb=PSDB.sb;
+  const xr=await sb.from("profiles").select("xp,level").eq("id",p.id).maybeSingle();
+  if(xr.data&&xr.data.xp!=null){
+    const into=xr.data.xp%200;
+    $("lv").textContent=xr.data.level;$("xpb").style.width=(into/2)+"%";
+    $("xpt").textContent=into+" of 200 XP to level "+(xr.data.level+1)+" \u00b7 "+xr.data.xp+" XP in total";
+    $("lvcard").hidden=false}
+  const [ar,ur]=await Promise.all([sb.from("achievements").select("id,name,description,xp").order("xp"),sb.from("user_achievements").select("achievement_id").eq("user_id",p.id)]);
+  if(ar.data&&ar.data.length){
+    const got=new Set((ur.data||[]).map(r=>r.achievement_id));
+    $("ach").innerHTML=ar.data.map(r=>'<div class="'+(got.has(r.id)?"":"off")+'"><b>'+esc(r.name)+(got.has(r.id)?" \u2713":"")+'</b><small>'+esc(r.description)+' \u00b7 '+r.xp+' XP</small></div>').join("");
+    $("achcard").hidden=false}
+  const r=await PSDB.myScores(),best={};
+  (r.data||[]).forEach(x=>{best[x.game]=Math.max(best[x.game]||0,x.score)});
+  $("scores").innerHTML=Object.keys(PSDB.GAMES).map(g=>'<div class="stat"><b>'+(best[g]||"-")+'</b><span>'+PSDB.GAMES[g]+'</span></div>').join("");
+  $("save").onclick=async()=>{
+    const v=$("nu").value.trim().toLowerCase();
+    if(!/^[a-z0-9_]{3,20}$/.test(v)){say("Use 3-20 characters: letters, numbers or underscore.",1);return}
+    const u=await PSDB.sb.from("profiles").update({username:v}).eq("id",p.id);
+    if(u.error)say(u.error.code==="23505"?"That username is taken.":"Couldn't save that username.",1);
+    else{$("un").textContent=v;$("av").textContent=v[0].toUpperCase();$("nu").value="";say("Username updated.")}};
+  $("out").onclick=async()=>{await PSDB.signOut();location.href="index.html"};
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:1000px}
+.top a{color:var(--mute);font-size:14px}
+.top a:hover{color:var(--cream)}
+.top a.btn{color:var(--on-accent)}
+.top .sp{flex:1}
+.top .logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+h1{font:800 36px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:26px 0 6px}
+.lead{color:var(--mute);margin:0 0 22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.card h2{margin:0 0 14px;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--mute)}
+label{display:block;font-size:14px;color:var(--mute);margin-bottom:6px}
+input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:12px 14px;font:inherit}
+.field{margin-bottom:14px}
+.btn{display:inline-block;border:0;border-radius:10px;padding:11px 20px;background:var(--accent);color:var(--on-accent);font:700 15px "DM Sans",sans-serif;cursor:pointer}
+.btn:hover{background:var(--accent-d)}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.alt:hover{border-color:var(--mute)}
+.btn.sm{padding:8px 16px;font-size:14px}
+.btn.full{width:100%}
+.seg{display:flex;gap:8px;margin-bottom:18px}
+.seg button{flex:1;background:var(--panel2);color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:10px;font:600 14px "DM Sans",sans-serif;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.msg{min-height:1.4em;font-size:14px;margin:12px 0 0;color:var(--mute)}
+.msg.err{color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--panel2);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font:800 28px "Bricolage Grotesque","Segoe UI",sans-serif}
+.stat span{color:var(--mute);font-size:13px}
+.av{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 24px "Bricolage Grotesque","Segoe UI",sans-serif}
+.who{display:flex;gap:16px;align-items:center}
+.who h2{margin:0;font:800 24px "Bricolage Grotesque","Segoe UI",sans-serif;text-transform:none;letter-spacing:0;color:var(--cream)}
+.who p{margin:0;color:var(--mute);font-size:14px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:500;font-size:13px}
+tr.me td{background:var(--panel2);font-weight:700}
+.empty{color:var(--mute);padding:18px 0}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+</style>
+<title>Sign in | PLAYVORA</title>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a>
+  <a href="index.html#explore">Explore</a><a href="leaderboard.html">Leaderboard</a><a href="settings.html">Settings</a>
+  <span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+  <a class="btn sm" id="who" href="login.html">Sign in</a>
+</div></header>
+<main class="wrap" style="max-width:440px">
+  <h1>Welcome</h1>
+  <p class="lead">Sign in to save your scores and join the leaderboards.</p>
+  <form class="card" id="f" novalidate>
+    <div class="seg" role="group" aria-label="Sign in or create account">
+      <button type="button" id="tin" aria-pressed="true">Sign in</button>
+      <button type="button" id="tup" aria-pressed="false">Create account</button>
+    </div>
+    <div class="field" id="ufield" hidden><label for="un">Username</label><input id="un" autocomplete="username" maxlength="20" placeholder="3-20 letters, numbers or _"></div>
+    <div class="field"><label for="em">Email</label><input id="em" type="email" autocomplete="email" placeholder="you@example.com"></div>
+    <div class="field" id="pfield"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" placeholder="At least 6 characters"><button type="button" id="forgot" style="background:none;border:0;padding:8px 0 0;color:var(--mute);font:600 13px inherit;cursor:pointer;text-decoration:underline">Forgot password?</button></div>
+    <button class="btn full" id="go" type="submit">Sign in</button>
+    <p id="legal" hidden style="font-size:13px;color:var(--mute);margin:12px 0 0">By creating an account you agree to the <a href="terms.html" style="color:var(--accent);text-decoration:underline">Terms</a> and <a href="privacy.html" style="color:var(--accent);text-decoration:underline">Privacy Policy</a>.</p>
+      <p class="msg" id="msg" role="status"></p>
+  </form>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA &middot; Discover. Play. Compete.</span><a href="index.html">Home</a></div></footer>
+<script src="js/common.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+let mode="in";
+function setMode(m){mode=m;$("tin").setAttribute("aria-pressed",m==="in");$("tup").setAttribute("aria-pressed",m==="up");$("ufield").hidden=m!=="up";$("legal").hidden=m!=="up";$("pfield").hidden=m==="reset";$("forgot").hidden=m!=="in";$("go").textContent=m==="in"?"Sign in":m==="up"?"Create account":"Send reset link";$("pw").autocomplete=m==="in"?"current-password":"new-password";say(m==="reset"?"Enter your email and we will send you a link to choose a new password.":"")}
+function say(t,err){$("msg").textContent=t;$("msg").className="msg"+(err?" err":"")}
+function friendly(m){m=m||"";
+  if(/not confirmed/i.test(m))return "Your email is not confirmed yet. Open the confirmation email we sent you, or contact the site admin.";
+  if(/invalid login/i.test(m))return "Wrong email or password. Please try again.";
+  if(/not authorized|rate limit|too many/i.test(m))return "We could not send an email right now. Please try again later or contact the site admin.";
+  return m}
+function next(){const n=new URLSearchParams(location.search).get("next");return /^[\w-]+\.html$/.test(n||"")?n:"index.html"}
+const RESET=!!(window.PV_CONFIG&&PV_CONFIG.passwordReset);
+if(!RESET){const f=$("forgot");f.textContent="Forgot your password? Email reset is not available yet, so please contact the site admin.";f.disabled=true;f.style.textDecoration="none";f.style.cursor="default";f.style.textAlign="left"}
+$("forgot").onclick=()=>setMode("reset");$("tin").onclick=()=>setMode("in");$("tup").onclick=()=>setMode("up");
+if(location.hash==="#signup")setMode("up");
+if(RESET&&location.hash==="#forgot")setMode("reset");
+if(new URLSearchParams(location.search).get("reset")==="1")say("Password updated. Please sign in with your new password.");
+PSDB.user().then(u=>{if(u)location.replace(next())});
+$("f").onsubmit=async e=>{
+  e.preventDefault();
+  if(!PSDB.ready){say("Can't reach the sign-in service. Check your connection and refresh.",1);return}
+  const email=$("em").value.trim(),pw=$("pw").value,name=$("un").value.trim().toLowerCase();
+  if(mode==="reset"){
+    if(!email){say("Enter your email address.",1);return}
+    $("go").disabled=true;say("One moment...");
+    try{
+      const r=await PSDB.sb.auth.resetPasswordForEmail(email,{redirectTo:new URL("reset.html",location.href).href});
+      if(r.error)say(friendly(r.error.message),1);else say("If that email has an account, a reset link is on its way. Check your inbox and spam folder.");
+    }catch(err){say("Something went wrong. Please try again.",1)}
+    $("go").disabled=false;return}
+  if(!email||!pw){say("Enter your email and password.",1);return}
+  $("go").disabled=true;say("One moment...");
+  try{
+    if(mode==="in"){
+      const r=await PSDB.signIn(email,pw);
+      if(r.error){say(friendly(r.error.message),1)}else location.replace(next());
+    }else{
+      if(!/^[a-z0-9_]{3,20}$/.test(name)){say("Username must be 3-20 characters: letters, numbers or underscore.",1);return}
+      if(pw.length<6){say("Password must be at least 6 characters.",1);return}
+      if(await PSDB.taken(name)){say("That username is taken. Try another.",1);return}
+      const r=await PSDB.signUp(email,pw,name);
+      if(r.error)say(friendly(r.error.message),1);
+      else{
+        const had=!!(r.data&&r.data.session);
+        if(had)await PSDB.sb.auth.signOut();
+        setMode("in");$("pw").value="";
+        say(had?"Account created successfully! Please sign in to continue.":"Account created successfully! We sent a confirmation link to your email. Confirm it, then sign in.");
+      }
+    }
+  }catch(err){say("Something went wrong. Please try again.",1)}
+  finally{if(!window.__redir)$("go").disabled=false}};
+</script>
+</body>
+</html>

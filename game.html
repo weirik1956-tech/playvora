@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game | PLAYVORA</title>
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/games.js"></script>
+<script src="js/bell.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14;--teal:#2ee6c5;--sun:#ffd23f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:980px}
+.top a:not(.btn):not(.ps-bell){color:var(--mute);font-size:14px}.top a:not(.btn):not(.ps-bell):hover{color:var(--cream)}
+.top .sp{flex:1}
+.logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)!important}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+.btn{display:inline-block;border:0;border-radius:12px;padding:12px 22px;background:var(--accent);color:var(--on-accent);font:700 15px "DM Sans",sans-serif;cursor:pointer}
+.btn:hover{background:var(--accent-d)}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.alt:hover{border-color:var(--mute)}
+.btn.sm{padding:7px 14px;font-size:13px;border-radius:10px}
+.btn:disabled{opacity:.6;cursor:wait}
+.hero{border-radius:22px;padding:32px;margin:26px 0 20px;display:flex;gap:24px;align-items:center;flex-wrap:wrap;color:#1a0b14}
+.hero .ico{font-size:84px;line-height:1}
+.hero h1{font:800 clamp(32px,5vw,48px)/1.05 "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1.5px;margin:0 0 6px}
+.hero .meta{font-weight:700;opacity:.8;margin-bottom:12px}
+.hero .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.hero .btn.alt{background:rgba(255,255,255,.55);color:#1a0b14;border:0}
+.hero .btn.alt[aria-pressed=true]{background:#1a0b14;color:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px}
+.card h2{margin:0 0 10px;font:800 20px "Bricolage Grotesque","Segoe UI",sans-serif}
+.card p{margin:0 0 10px;color:var(--mute)}
+.card ol{margin:0;padding-left:20px;color:var(--mute)}
+.card li{margin:4px 0}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.info div{padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.info div:first-child{border-top:0}
+.info b{display:block;color:var(--cream)}
+.info span{color:var(--mute)}
+.stars{color:var(--sun);letter-spacing:2px;white-space:nowrap}
+.stars i{font-style:normal;color:var(--line)}
+.sum{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.sum b{font:800 34px "Bricolage Grotesque","Segoe UI",sans-serif}
+.pick{display:flex;gap:6px;margin:10px 0}
+.pick button{background:var(--panel2);border:1px solid var(--line);color:var(--mute);width:42px;height:42px;border-radius:10px;font-size:20px;cursor:pointer}
+.pick button[aria-pressed=true]{background:var(--sun);color:#2a2000;border-color:var(--sun)}
+textarea{width:100%;min-height:80px;resize:vertical;background:var(--panel2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:11px 14px;font:inherit}
+.rv{padding:14px 0;border-top:1px solid var(--line)}
+.rv:first-of-type{border-top:0}
+.rv .h{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+.rv .h a{font-weight:700}.rv .h a:hover{text-decoration:underline}
+.rv .h small{color:var(--mute)}
+.rv p{margin:0;color:var(--cream);white-space:pre-wrap;word-wrap:break-word}
+.rv .rep{background:none;border:0;color:var(--mute);font-size:12px;cursor:pointer;text-decoration:underline;margin-left:auto}
+.top5 div{display:flex;gap:12px;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.top5 div:first-child{border-top:0}
+.top5 .n{width:22px;color:var(--mute);font-weight:800}.top5 .u{flex:1}.top5 .s{font-weight:700}
+.rel{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.rel a{border-radius:14px;padding:16px;color:#1a0b14;font-weight:700;display:block}
+.rel a span{display:block;font-size:34px}
+.msg{min-height:1.3em;margin:8px 0 0;font-size:14px;color:var(--mute)}.msg.bad{color:var(--accent)}
+.empty{color:var(--mute);margin:0;font-size:14px}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:980px}
+@media(max-width:720px){.cols{grid-template-columns:1fr}.hero{padding:22px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a>
+  <a href="index.html#explore">Explore</a><a href="challenges.html">Challenges</a><a href="leaderboard.html">Leaderboard</a>
+  <span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+  <a class="btn sm" id="who" data-base="" href="login.html">Sign in</a>
+</div></header>
+
+<main class="wrap" id="main"><p class="empty" style="padding:40px 0">Loading...</p></main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA</span><span><a href="terms.html">Terms</a> &middot; <a href="privacy.html">Privacy</a></span></div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const stars=n=>'<span class="stars" aria-label="'+n+' out of 5">'+"\u2605".repeat(Math.round(n))+"<i>"+"\u2605".repeat(5-Math.round(n))+"</i></span>";
+const GAMES=psCatalog(),slug=psSlug;
+const key=new URLSearchParams(location.search).get("g")||"";
+const g=GAMES.find(x=>slug(x.n)===key);
+let uid=null,mine=null,rating=0;
+$("tt").onclick=()=>PS.toggle();
+
+function say(t,bad){const e=$("msg");if(e){e.textContent=t;e.className="msg"+(bad?" bad":"")}}
+function ago(t){const d=(Date.now()-new Date(t))/864e5;return d<1?"today":d<2?"yesterday":d<30?Math.floor(d)+" days ago":new Date(t).toLocaleDateString()}
+
+function page(){
+  const info=PS_INFO[key]||{},rel=GAMES.filter(x=>x.c===g.c&&x!==g).slice(0,4);
+  document.title=g.n+" | PLAYVORA";
+  $("main").innerHTML=
+   '<div class="hero" style="background:linear-gradient(135deg,'+g.g[0]+','+g.g[1]+')"><div class="ico" aria-hidden="true">'+g.i+'</div><div><h1>'+g.n+'</h1><div class="meta">'+g.c+(info.difficulty?" \u00b7 "+info.difficulty:"")+' \u00b7 <span id="hsum">No ratings yet</span></div><div class="row">'
+   +(g.u?'<a class="btn" style="background:#1a0b14;color:#fff" href="'+g.u+'">Play now</a>':'<span class="btn alt" style="cursor:default">Coming soon</span>')
+   +'<button class="btn alt" id="fav" aria-pressed="false">&#9825; Favourite</button><a class="btn alt" href="community.html?game='+key+'">Discuss</a></div></div></div>'
+  +'<div class="cols"><div>'
+   +'<div class="card"><h2>About</h2><p style="margin:0">'+esc(info.desc||"No description yet.")+'</p></div>'
+   +(info.how?'<div class="card"><h2>How to play</h2><ol>'+info.how.map(h=>'<li>'+esc(h)+'</li>').join("")+'</ol></div>':"")
+   +'<div class="card"><h2>Ratings and reviews</h2><div class="sum" id="sum"></div><div id="form"></div><div id="revs"></div></div>'
+  +'</div><div>'
+   +'<div class="card info"><h2>Details</h2>'
+   +(info.controls?'<div><b>Controls</b><span>'+esc(info.controls)+'</span></div>':"")
+   +'<div><b>Difficulty</b><span>'+esc(info.difficulty||"Not rated")+'</span></div><div><b>Works on</b><span>'+esc(info.devices||"Desktop")+'</span></div><div><b>Category</b><span>'+esc(g.c)+'</span></div></div>'
+   +'<div class="card"><h2>Top scores</h2><div class="top5" id="top5"><p class="empty">'+(info.key?"Loading...":"No scores for this game.")+'</p></div></div>'
+  +'</div></div>'
+  +(rel.length?'<div class="card"><h2>More '+esc(g.c)+' games</h2><div class="rel">'+rel.map(x=>'<a href="game.html?g='+slug(x.n)+'" style="background:linear-gradient(135deg,'+x.g[0]+','+x.g[1]+')"><span>'+x.i+'</span>'+x.n+'</a>').join("")+'</div></div>':"")}
+
+async function loadTop(){
+  const k=(PS_INFO[key]||{}).key;if(!k||!window.psdb)return;
+  const r=await psdb.from("leaderboard").select("username,score").eq("game",k).order("score",{ascending:false}).limit(5);
+  $("top5").innerHTML=r.data&&r.data.length?r.data.map((x,i)=>'<div><span class="n">'+(i+1)+'</span><a class="u" href="player.html?u='+encodeURIComponent(x.username)+'">'+esc(x.username)+'</a><span class="s">'+x.score+'</span></div>').join(""):'<p class="empty">No scores yet. Be the first!</p>'}
+
+function formHtml(){
+  if(!uid)return'<p class="empty" style="margin-bottom:12px"><a href="login.html?next=game.html%3Fg%3D'+encodeURIComponent(key)+'" style="color:var(--accent);text-decoration:underline">Sign in</a> to rate this game and write a review.</p>';
+  return'<div class="pick" id="pick" role="group" aria-label="Your rating">'+[1,2,3,4,5].map(n=>'<button data-r="'+n+'" aria-pressed="false" aria-label="'+n+' star'+(n>1?"s":"")+'">\u2605</button>').join("")+'</div>'
+   +'<textarea id="body" maxlength="500" placeholder="Write a review (optional, up to 500 characters)" aria-label="Your review"></textarea>'
+   +'<p style="margin:10px 0 0"><button class="btn" id="save">Save review</button> <button class="btn alt" id="del" hidden>Delete my review</button></p><p class="msg" id="msg" role="status"></p>'}
+
+function setPick(n){rating=n;document.querySelectorAll("#pick button").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.r<=n&&n>0)))}
+
+async function loadReviews(){
+  const r=await psdb.from("reviews").select("id,user_id,rating,body,created_at,profiles(username)").eq("game",key).order("created_at",{ascending:false}).limit(50);
+  if(r.error){$("revs").innerHTML='<p class="empty">Reviews are not set up yet. Run supabase-reviews.sql in Supabase.</p>';$("form").innerHTML="";return}
+  const list=r.data||[],n=list.length,avg=n?list.reduce((a,x)=>a+x.rating,0)/n:0;
+  $("sum").innerHTML=n?'<b>'+avg.toFixed(1)+'</b>'+stars(avg)+'<span style="color:var(--mute)">'+n+(n===1?" rating":" ratings")+'</span>':'<span class="empty">No ratings yet. Be the first to rate it.</span>';
+  $("hsum").textContent=n?avg.toFixed(1)+" \u2605 ("+n+")":"No ratings yet";
+  mine=list.find(x=>x.user_id===uid)||null;
+  if(uid){setPick(mine?mine.rating:0);$("body").value=mine&&mine.body?mine.body:"";$("del").hidden=!mine;$("save").textContent=mine?"Update review":"Save review"}
+  const others=list.filter(x=>x.body||x.user_id!==uid);
+  $("revs").innerHTML=others.length?others.map(x=>{const u=x.profiles&&x.profiles.username;
+    return'<div class="rv"><div class="h">'+stars(x.rating)+(u?'<a href="player.html?u='+encodeURIComponent(u)+'">'+esc(u)+'</a>':"<span>Player</span>")+'<small>'+ago(x.created_at)+'</small>'+(uid&&x.user_id!==uid&&x.body?'<button class="rep" data-rep="'+x.id+'">Report</button>':"")+'</div>'+(x.body?'<p>'+esc(x.body)+'</p>':"")+'</div>'}).join(""):""}
+
+async function setupFav(){
+  const b=$("fav");let on=false;
+  const paint=()=>{b.setAttribute("aria-pressed",String(on));b.innerHTML=(on?"&#9829; Favourited":"&#9825; Favourite")};
+  if(uid&&window.psdb){const r=await psdb.from("favourites").select("game").eq("game",key);on=!!(r.data&&r.data.length)}
+  paint();
+  b.onclick=async()=>{
+    if(!uid){location.href="login.html?next="+encodeURIComponent("game.html?g="+key);return}
+    on=!on;paint();
+    const r=on?await psdb.from("favourites").insert({user_id:uid,game:key}):await psdb.from("favourites").delete().eq("user_id",uid).eq("game",key);
+    if(r.error){on=!on;paint()}}}
+
+document.addEventListener("click",async e=>{
+  const t=e.target;
+  if(t.closest("#pick")&&t.dataset.r){setPick(+t.dataset.r);return}
+  if(t.id==="save"){
+    if(!rating)return say("Pick a star rating first.",1);
+    t.disabled=true;
+    const body=$("body").value.trim()||null,now=new Date().toISOString();
+    const r=mine?await psdb.from("reviews").update({rating,body,updated_at:now}).eq("id",mine.id)
+               :await psdb.from("reviews").insert({user_id:uid,game:key,rating,body});
+    t.disabled=false;
+    if(r.error)return say(r.error.message,1);
+    await loadReviews();say("Thanks! Your review is saved.")}
+  else if(t.id==="del"){
+    if(!mine||!confirm("Delete your review?"))return;
+    const r=await psdb.from("reviews").delete().eq("id",mine.id);
+    if(r.error)return say(r.error.message,1);
+    mine=null;await loadReviews();say("Your review was deleted.")}
+  else if(t.dataset.rep){
+    const why=prompt("Why are you reporting this review? (a few words)");
+    if(!why||why.trim().length<3)return;
+    const r=await psdb.from("reports").insert({reporter:uid,kind:"review",target:t.dataset.rep,reason:why.trim().slice(0,300)});
+    t.textContent=r.error?(r.error.code==="23505"?"Already reported":"Could not report"):"Reported. Thank you.";t.disabled=true}});
+
+(async()=>{
+  if(!g){$("main").innerHTML='<div class="card" style="margin-top:26px"><h2>Game not found</h2><p>We could not find that game.</p><a class="btn" href="index.html#explore">Browse games</a></div>';return}
+  page();
+  if(window.psdb){
+    PSAuth.nav($("who"));
+    const u=await PSAuth.user();uid=u?u.id:null;
+    $("form").innerHTML=formHtml();
+    await setupFav();loadTop();loadReviews()
+  }else{$("sum").innerHTML='<span class="empty">Ratings are unavailable offline.</span>';$("top5").innerHTML='<p class="empty">Scores are unavailable offline.</p>';$("fav").onclick=()=>{}}
+  })();
+</script>
+</body>
+</html>

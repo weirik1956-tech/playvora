@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings | PLAYVORA</title>
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px}
+.top a{color:var(--mute);font-size:14px}.top a:hover{color:var(--cream)}
+.top .sp{flex:1}
+.logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)!important}
+h1{font:800 36px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:26px 0 20px}
+.layout{display:grid;grid-template-columns:200px 1fr;gap:26px;align-items:start;padding-bottom:30px}
+.side{display:flex;flex-direction:column;gap:4px;position:sticky;top:16px}
+.side button{text-align:left;background:none;border:0;color:var(--mute);font:600 15px "DM Sans",sans-serif;padding:10px 14px;border-radius:10px;cursor:pointer}
+.side button:hover{background:var(--panel);color:var(--cream)}
+.side button[aria-current=true]{background:var(--panel2);color:var(--cream)}
+.panel[hidden],[hidden]{display:none!important}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:16px}
+.card h2{margin:0 0 4px;font:800 20px "Bricolage Grotesque","Segoe UI",sans-serif}
+.card .sub{color:var(--mute);font-size:14px;margin:0 0 16px}
+label,.lbl{display:block;font-size:14px;color:var(--mute);margin:16px 0 6px}
+input[type=text],input[type=email],input[type=password],textarea,select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:11px 14px;font:inherit;font-size:15px}
+textarea{resize:vertical;min-height:84px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.seg button,.chip,.sw,.btn{font:600 14px "DM Sans",sans-serif;cursor:pointer}
+.seg button,.chip{background:var(--panel2);color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:9px 16px}
+.chip{border-radius:999px;padding:7px 14px}
+.seg button[aria-pressed=true],.chip[aria-pressed=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.sw{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);padding:0}
+.sw[aria-pressed=true]{outline:2px solid var(--cream);outline-offset:2px}
+input[type=color]{width:44px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:3px;cursor:pointer}
+.btn{border:0;border-radius:10px;padding:10px 18px;background:var(--accent);color:var(--on-accent)}
+.btn:hover{background:var(--accent-d)}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.alt:hover{border-color:var(--mute)}
+.prev{display:flex;gap:10px;align-items:center;background:var(--panel2);border-radius:12px;padding:14px;margin-top:18px;color:var(--mute);font-size:14px}
+.msg{min-height:1.3em;margin:12px 0 0;font-size:14px;color:var(--mute)}.msg.bad{color:var(--accent)}
+.note{background:var(--panel2);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--mute);margin-bottom:16px}
+.note a{color:var(--accent);text-decoration:underline}
+.lvl{display:inline-block;background:var(--panel2);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--mute);margin-top:6px}
+.chk{display:flex;gap:10px;align-items:flex-start;margin-top:6px}.chk input{margin-top:4px}
+.chk span{color:var(--cream)}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;position:static;padding-bottom:4px}.side button{white-space:nowrap}}
+</style>
+<script src="js/bell.js" defer></script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a><span class="sp"></span>
+  <a href="index.html">Home</a><a href="leaderboard.html">Leaderboard</a><a href="admin.html" id="adm" hidden>Admin</a>
+</div></header>
+
+<main class="wrap">
+  <h1>Settings</h1>
+  <div class="layout">
+    <nav class="side" id="side" aria-label="Settings sections">
+      <button data-p="appearance">Appearance</button>
+      <button data-p="accessibility">Accessibility</button>
+      <button data-p="profile">Profile</button>
+      <button data-p="account">Account</button>
+      <button data-p="privacy">Privacy</button>
+      <button data-p="data">Saved data</button>
+    </nav>
+
+    <div>
+      <div class="note" id="upg" hidden>Some profile options need the database upgrade. Run <b>supabase-upgrade.sql</b>, then <b>supabase-players.sql</b>, in your Supabase SQL Editor, then refresh this page.</div>
+
+      <section class="panel" id="p-appearance">
+        <div class="card">
+          <h2>Appearance</h2><p class="sub">Look and feel across PLAYVORA. Signed-in players get these on every device.</p>
+          <span class="lbl">Theme</span>
+          <div class="row seg">
+            <button data-k="theme" data-v="light" aria-pressed="false">Light</button>
+            <button data-k="theme" data-v="dark" aria-pressed="false">Dark</button>
+            <button data-k="theme" data-v="system" aria-pressed="false">Match device</button>
+          </div>
+          <label for="acc">Accent colour</label>
+          <div class="row"><input type="color" id="acc" aria-label="Pick an accent colour"><span class="row" id="sws"></span><button class="btn alt" id="reset">Reset accent</button></div>
+          <span class="lbl">Interface density</span>
+          <div class="row seg">
+            <button data-k="density" data-v="comfortable" aria-pressed="false">Comfortable</button>
+            <button data-k="density" data-v="compact" aria-pressed="false">Compact</button>
+          </div>
+          <div class="prev"><button class="btn" tabindex="-1">Play now</button>Buttons and highlights use your accent colour.</div>
+        </div>
+      </section>
+
+      <section class="panel" id="p-accessibility" hidden>
+        <div class="card">
+          <h2>Accessibility</h2><p class="sub">Make PLAYVORA easier to read and use.</p>
+          <span class="lbl">Text size</span>
+          <div class="row seg">
+            <button data-k="text" data-v="normal" aria-pressed="false">Normal</button>
+            <button data-k="text" data-v="large" aria-pressed="false">Larger</button>
+          </div>
+          <span class="lbl">Contrast</span>
+          <div class="row seg">
+            <button data-k="contrast" data-v="normal" aria-pressed="false">Normal</button>
+            <button data-k="contrast" data-v="high" aria-pressed="false">High</button>
+          </div>
+          <span class="lbl">Animation</span>
+          <div class="row seg">
+            <button data-k="motion" data-v="system" aria-pressed="false">Match device</button>
+            <button data-k="motion" data-v="reduced" aria-pressed="false">Reduce motion</button>
+            <button data-k="motion" data-v="full" aria-pressed="false">Allow all</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="p-profile" hidden>
+        <div class="card out-only"><h2>Profile</h2><p class="sub">Sign in to edit your player profile.</p><a class="btn" href="login.html?next=settings.html">Sign in</a></div>
+        <div class="card in-only">
+          <h2>Profile</h2><p class="sub">How other players see you.</p>
+          <span class="lvl" id="lvl" hidden></span>
+          <label for="dn">Display name</label><input type="text" id="dn" maxlength="30" placeholder="Shown next to your username">
+          <label for="bio">Short bio</label><textarea id="bio" maxlength="160" placeholder="Tell players about yourself (160 characters)"></textarea>
+          <label for="st">Status</label>
+          <select id="st"><option value="online">Online</option><option value="away">Away</option><option value="busy">Busy</option><option value="invisible">Invisible</option></select>
+          <span class="lbl">Favourite genres</span>
+          <div class="row" id="genres"></div>
+          <p class="row" style="margin:18px 0 0"><button class="btn" id="save-profile">Save profile</button><a class="btn alt" id="pub-link" href="#">View public profile</a></p>
+          <p class="msg" data-m="profile" role="status"></p>
+        </div>
+      </section>
+
+      <section class="panel" id="p-account" hidden>
+        <div class="card out-only"><h2>Account</h2><p class="sub">Sign in to manage your account.</p><a class="btn" href="login.html?next=settings.html">Sign in</a></div>
+        <div class="in-only">
+          <div class="card">
+            <h2>Username</h2><p class="sub">3 to 20 lowercase letters, numbers or underscores. <span id="since"></span></p>
+            <input type="text" id="un" maxlength="20" autocomplete="username" aria-label="Username">
+            <p style="margin:14px 0 0"><button class="btn" id="save-un">Change username</button></p>
+            <p class="msg" data-m="un" role="status"></p>
+          </div>
+          <div class="card">
+            <h2>Email</h2><p class="sub">Current email: <b id="em-now"></b></p>
+            <input type="email" id="em" autocomplete="email" placeholder="New email address" aria-label="New email address">
+            <p style="margin:14px 0 0"><button class="btn" id="save-em">Change email</button></p>
+            <p class="msg" data-m="em" role="status"></p>
+          </div>
+          <div class="card">
+            <h2>Password</h2><p class="sub">At least 8 characters.</p>
+            <input type="password" id="pw" autocomplete="new-password" placeholder="New password" aria-label="New password">
+            <p style="margin:14px 0 0"><button class="btn" id="save-pw">Change password</button></p>
+            <p class="msg" data-m="pw" role="status"></p>
+          </div>
+          <div class="card">
+            <h2>Sessions</h2><p class="sub">Sign out here, or everywhere you are signed in.</p>
+            <div class="row"><button class="btn alt" id="out">Sign out</button><button class="btn alt" id="out-all">Sign out of all devices</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" id="p-privacy" hidden>
+        <div class="card out-only"><h2>Privacy</h2><p class="sub">Sign in to manage your privacy.</p><a class="btn" href="login.html?next=settings.html">Sign in</a></div>
+        <div class="card in-only">
+          <h2>Privacy</h2><p class="sub">Your username and best scores always appear on leaderboards.</p>
+          <label class="chk" for="pub"><input type="checkbox" id="pub"><span>Make my profile public<br><small style="color:var(--mute)">Private profiles hide your bio, status, favourite genres and achievements from other players. Your username, level and best scores stay visible.</small></span></label>
+          <p class="msg" data-m="privacy" role="status"></p>
+        </div>
+      </section>
+
+      <section class="panel" id="p-data" hidden>
+        <div class="card">
+          <h2>Saved data</h2><p class="sub">Best scores kept on this device. Scores already on the leaderboard are not affected.</p>
+          <button class="btn alt" id="clear">Clear high scores on this device</button>
+          <p class="msg" data-m="data" role="status"></p>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA</span><span>Discover. Play. Compete.</span></div></footer>
+
+<script>
+const $=id=>document.getElementById(id),qa=s=>[...document.querySelectorAll(s)];
+const GENRES=["Puzzle","Racing","Action","Sports","Brain","Arcade","Adventure","Strategy"];
+const PRE=["#ff5a7a","#8b6cff","#2ee6c5","#ffd23f","#4f9dff","#ff9f6b"];
+const KEYS=["theme","accent","density","motion","contrast","text"];
+const FULL="username,is_admin,created_at,display_name,is_public,xp,level";
+let s=PS.get(),uid=null,email="",prof=null,det=null,tmr;
+
+function say(p,t,bad){const e=document.querySelector('[data-m="'+p+'"]');if(e){e.textContent=t;e.className="msg"+(bad?" bad":"")}}
+function show(p){
+  if(!$("p-"+p))p="appearance";
+  qa(".panel").forEach(x=>x.hidden=x.id!=="p-"+p);
+  qa("[data-p]").forEach(b=>b.setAttribute("aria-current",String(b.dataset.p===p)));
+  history.replaceState(null,"","#"+p)}
+function sync(){
+  qa("[data-k]").forEach(b=>b.setAttribute("aria-pressed",String(s[b.dataset.k]===b.dataset.v)));
+  $("acc").value=s.accent;qa(".sw").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.c===s.accent)))}
+function commit(){
+  PS.save(s);PS.apply(s);sync();
+  if(!uid)return;
+  clearTimeout(tmr);
+  tmr=setTimeout(()=>{const d={};KEYS.forEach(k=>d[k]=s[k]);
+    psdb.from("user_settings").upsert({user_id:uid,data:d,updated_at:new Date().toISOString()}).then(()=>{})},700)}
+function render(){
+  const on=!!uid;
+  qa(".in-only").forEach(e=>e.hidden=!on);qa(".out-only").forEach(e=>e.hidden=on);
+  if(!on||!prof)return;
+  $("em-now").textContent=email;$("un").value=prof.username||"";
+  $("dn").value=prof.display_name||"";$("bio").value=(det&&det.bio)||"";$("st").value=(det&&det.status)||"online";$("pub-link").href="player.html?u="+encodeURIComponent(prof.username||"");
+  $("pub").checked=prof.is_public!==false;
+  const g=(det&&det.favourite_genres)||[];qa(".chip").forEach(b=>b.setAttribute("aria-pressed",String(g.includes(b.dataset.g))));
+  if(prof.created_at)$("since").textContent="Member since "+new Date(prof.created_at).toLocaleDateString()+".";
+  if(prof.xp!=null){$("lvl").textContent="Level "+prof.level+" \u00b7 "+prof.xp+" XP";$("lvl").hidden=false}
+  $("adm").hidden=!prof.is_admin}
+
+$("sws").innerHTML=PRE.map(c=>'<button class="sw" data-c="'+c+'" style="background:'+c+'" aria-label="Accent '+c+'" aria-pressed="false"></button>').join("");
+$("genres").innerHTML=GENRES.map(g=>'<button class="chip" data-g="'+g+'" aria-pressed="false">'+g+'</button>').join("");
+$("side").onclick=e=>{if(e.target.dataset.p)show(e.target.dataset.p)};
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.dataset.k){s[t.dataset.k]=t.dataset.v;commit()}
+  else if(t.dataset.c){s.accent=t.dataset.c;commit()}
+  else if(t.classList.contains("chip"))t.setAttribute("aria-pressed",String(t.getAttribute("aria-pressed")!=="true"))});
+$("acc").oninput=e=>{s.accent=e.target.value;commit()};
+$("reset").onclick=()=>{s.accent=PS.DEFAULTS.accent;commit()};
+
+$("save-profile").onclick=async()=>{
+  const g=qa(".chip[aria-pressed=true]").map(b=>b.dataset.g);
+  const a=await psdb.from("profiles").update({display_name:$("dn").value.trim()||null}).eq("id",uid);
+  const b=await psdb.from("profile_details").upsert({user_id:uid,bio:$("bio").value.trim()||null,status:$("st").value,favourite_genres:g,updated_at:new Date().toISOString()});
+  const err=a.error||b.error;
+  say("profile",err?"Could not save. Run supabase-upgrade.sql and supabase-players.sql first.":"Profile saved.",!!err)};
+$("save-un").onclick=async()=>{
+  const v=$("un").value.trim().toLowerCase();
+  if(!/^[a-z0-9_]{3,20}$/.test(v))return say("un","Use 3 to 20 lowercase letters, numbers or underscores.",1);
+  const{error}=await psdb.from("profiles").update({username:v}).eq("id",uid);
+  say("un",error?(error.code==="23505"?"That username is taken.":"Could not change the username."):"Username changed.",!!error)};
+$("save-em").onclick=async()=>{
+  const v=$("em").value.trim();if(!v)return say("em","Enter the new email address.",1);
+  const{error}=await psdb.auth.updateUser({email:v});
+  say("em",error?error.message:"Check your inbox to confirm the change.",!!error)};
+$("save-pw").onclick=async()=>{
+  const v=$("pw").value;if(v.length<8)return say("pw","Password needs at least 8 characters.",1);
+  const{error}=await psdb.auth.updateUser({password:v});
+  if(!error)$("pw").value="";say("pw",error?error.message:"Password changed.",!!error)};
+$("pub").onchange=async e=>{
+  const{error}=await psdb.from("profiles").update({is_public:e.target.checked}).eq("id",uid);
+  say("privacy",error?"Could not save. Run supabase-upgrade.sql first.":"Saved.",!!error)};
+$("out").onclick=async()=>{await psdb.auth.signOut();location.href="index.html"};
+$("out-all").onclick=async()=>{await psdb.auth.signOut({scope:"global"});location.href="index.html"};
+$("clear").onclick=()=>{
+  if(!confirm("Clear the best scores saved on this device for every game?"))return;
+  ["gh_tetris_best","gh_shooter_best","gh_snake_best","gh_2048_best","gh_memory_best","gh_minesweeper_best","gh_breakout_best"].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+  say("data","High scores cleared.")};
+
+(async()=>{
+  sync();show(location.hash.slice(1)||"appearance");
+  const u=window.psdb?await PSAuth.user():null;
+  if(u){
+    uid=u.id;email=u.email||"";
+    let p=await psdb.from("profiles").select(FULL).eq("id",uid).maybeSingle();
+    if(p.error){$("upg").hidden=false;p=await psdb.from("profiles").select("username,is_admin,created_at").eq("id",uid).maybeSingle()}
+    prof=p.data;
+    const d=await psdb.from("profile_details").select("bio,status,favourite_genres").eq("user_id",uid).maybeSingle();
+    if(d.error)$("upg").hidden=false;else det=d.data;
+    const c=await psdb.from("user_settings").select("data").eq("user_id",uid).maybeSingle();
+    if(c.data&&c.data.data){s=Object.assign(PS.get(),c.data.data);PS.save(s);PS.apply(s);sync()}
+  }
+  render()})();
+</script>
+</body>
+</html>

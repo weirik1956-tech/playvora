@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard | PLAYVORA</title>
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/games.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14;--teal:#2ee6c5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px}
+.top a:not(.btn){color:var(--mute);font-size:14px}.top a:not(.btn):hover{color:var(--cream)}
+.top .sp{flex:1}
+.logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)!important}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+.btn{display:inline-block;border:0;border-radius:10px;padding:10px 18px;background:var(--accent);color:var(--on-accent);font:700 14px "DM Sans",sans-serif;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--accent-d)}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.alt:hover{border-color:var(--mute)}
+.btn.sm{padding:7px 14px;font-size:13px}
+main{padding:26px 0 10px}
+.hero{background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px;padding:26px;margin-bottom:18px}
+.hero h1{font:800 clamp(28px,5vw,40px) "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:0 0 4px;line-height:1.1}
+.hero p{margin:0 0 14px;color:var(--mute)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pill{background:var(--ink);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:14px;color:var(--mute)}
+.pill b{color:var(--cream)}
+.bar{height:10px;background:var(--ink);border-radius:999px;overflow:hidden;margin:14px 0 6px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+.xpt{font-size:13px;color:var(--mute);margin:0 0 16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card.wide{grid-column:1/-1}
+.card h2{margin:0 0 12px;font:800 19px "Bricolage Grotesque","Segoe UI",sans-serif;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.card h2 a{font:500 13px "DM Sans",sans-serif;color:var(--mute)}
+.card h2 a:hover{color:var(--cream)}
+.empty{margin:0;color:var(--mute);font-size:14px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.tile{display:flex;gap:12px;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px;transition:border-color .15s}
+.tile:hover{border-color:var(--mute)}
+.th{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-size:24px;flex:none}
+.tx{min-width:0}.tx b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tx small{color:var(--mute)}
+.ch{padding:10px 0;border-top:1px solid var(--line)}.ch:first-of-type{border-top:0;padding-top:0}
+.ch .t{display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.ch .t span{color:var(--teal);font-weight:700;white-space:nowrap}
+.ch .bar{height:8px;margin:6px 0 0;background:var(--panel2)}
+.ch.done .bar i{background:var(--teal)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.stat{background:var(--panel2);border-radius:12px;padding:10px 14px}
+.stat b{display:block;font:800 24px "Bricolage Grotesque","Segoe UI",sans-serif}
+.stat span{color:var(--mute);font-size:13px}
+.ach{display:grid;gap:8px}
+.ach div{background:var(--panel2);border-radius:10px;padding:10px 12px}
+.ach b{display:block}.ach small{color:var(--mute)}
+.note{background:var(--panel2);border-left:4px solid var(--accent);border-radius:10px;padding:14px 16px;color:var(--mute)}
+.note a{color:var(--accent);text-decoration:underline}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.top .wrap a:not(.btn):not(.logo){display:none}}
+</style>
+<script src="js/bell.js" defer></script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a>
+  <a href="index.html#explore">Explore</a><a href="challenges.html">Challenges</a><a href="leaderboard.html">Leaderboard</a><a href="friends.html">Friends</a><a href="settings.html">Settings</a>
+  <span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+  <a class="btn sm" id="who" data-base="" href="login.html">Sign in</a>
+</div></header>
+
+<main class="wrap" id="main"><div class="note">Loading your dashboard...</div></main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA</span><span>Discover. Play. Compete.</span></div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slug=n=>n.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const CAT=psCatalog(),PLAY=CAT.filter(g=>g.u);
+const keyOf=g=>(g.u.match(/games\/([\w-]+)\.html/)||[])[1];
+const BYKEY={};PLAY.forEach(g=>{BYKEY[keyOf(g)]=g});
+$("tt").onclick=()=>PS.toggle();
+
+function tile(g,sub){return '<a class="tile" href="'+g.u+'"><span class="th" style="background:linear-gradient(135deg,'+g.g[0]+','+g.g[1]+')">'+g.i+'</span><span class="tx"><b>'+g.n+'</b><small>'+sub+'</small></span></a>'}
+function streakOf(days){
+  const set=new Set(days),f=x=>x.toISOString().slice(0,10);
+  let d=new Date();if(!set.has(f(d)))d=new Date(d-864e5);
+  let n=0;while(set.has(f(d))){n++;d=new Date(d-864e5)}return n}
+function greeting(){const h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening"}
+
+(async()=>{
+  if(!window.psdb){$("main").innerHTML='<div class="note">Could not reach PLAYVORA. Check your connection and refresh.</div>';return}
+  PSAuth.nav($("who"));
+  const u=await PSAuth.user();
+  if(!u){$("main").innerHTML='<div class="note"><a href="login.html?next=dashboard.html">Sign in</a> to see your personal dashboard, or <a href="index.html">browse the games</a>.</div>';return}
+  const uid=u.id;
+  const [pr,dt,sc,cnt,fv,ch,cl,fr,ua,ac]=await Promise.all([
+    psdb.from("profiles").select("username,display_name,xp,level").eq("id",uid).maybeSingle(),
+    psdb.from("profile_details").select("favourite_genres").eq("user_id",uid).maybeSingle(),
+    psdb.from("scores").select("game,score,created_at").eq("user_id",uid).order("created_at",{ascending:false}).limit(300),
+    psdb.from("scores").select("id",{count:"exact",head:true}).eq("user_id",uid),
+    psdb.from("favourites").select("game"),
+    psdb.rpc("my_challenges"),
+    psdb.from("challenge_claims").select("day").order("day",{ascending:false}).limit(60),
+    psdb.rpc("my_friends"),
+    psdb.from("user_achievements").select("achievement_id,unlocked_at").eq("user_id",uid).order("unlocked_at",{ascending:false}).limit(3),
+    psdb.from("achievements").select("id,name,description,xp")]);
+
+  const p=pr.data||{username:"player",xp:0,level:1};
+  const genres=(dt.data&&dt.data.favourite_genres)||[];
+  const scores=sc.data||[],best={},plays={},recentKeys=[];
+  scores.forEach(r=>{
+    best[r.game]=Math.max(best[r.game]||0,r.score);plays[r.game]=(plays[r.game]||0)+1;
+    if(!recentKeys.includes(r.game)&&BYKEY[r.game])recentKeys.push(r.game)});
+  const total=cnt.count!=null?cnt.count:scores.length;
+  const streak=cl.data?streakOf(cl.data.map(r=>r.day)):0;
+  const chs=ch.data||[],chDone=chs.filter(c=>c.claimed).length;
+
+  // recommendations: unplayed games first, favourite genres ahead of the rest
+  const unplayed=PLAY.filter(g=>!plays[keyOf(g)]).sort((a,b)=>(genres.includes(b.c)-genres.includes(a.c)));
+  const rec=(unplayed.length?unplayed:PLAY.slice().sort((a,b)=>(plays[keyOf(a)]||0)-(plays[keyOf(b)]||0))).slice(0,4);
+  const next=recentKeys.length?BYKEY[recentKeys[0]]:rec[0];
+
+  const favSet=new Set((fv.data||[]).map(r=>r.game)),favs=CAT.filter(g=>favSet.has(slug(g.n)));
+  const into=(p.xp||0)%200;
+  const fl=fr.data||[],friendsN=fl.filter(x=>x.relation==="friend").length,incoming=fl.filter(x=>x.relation==="incoming").length;
+  const got=new Set((ua.data||[]).map(r=>r.achievement_id)),achMap={};(ac.data||[]).forEach(a=>achMap[a.id]=a);
+  const recentAch=(ua.data||[]).map(r=>achMap[r.achievement_id]).filter(Boolean);
+
+  let h='<section class="hero"><h1>'+greeting()+', '+esc(p.display_name||p.username)+'</h1><p>Here is where you left off.</p>'
+    +'<div class="row"><span class="pill">Level <b>'+(p.level||1)+'</b></span><span class="pill"><b>'+(p.xp||0)+'</b> XP</span>'
+    +(streak?'<span class="pill"><b>'+streak+'</b>-day streak</span>':'')
+    +(next?'<a class="btn" href="'+next.u+'">'+(recentKeys.length?"Continue with ":"Play ")+next.n+'</a>':'')+'</div>'
+    +'<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="200" aria-valuenow="'+into+'"><i style="width:'+(into/2)+'%"></i></div>'
+    +'<p class="xpt">'+into+' of 200 XP to level '+((p.level||1)+1)+'</p></section>';
+
+  h+='<div class="grid">';
+  h+='<div class="card"><h2>Daily challenges <a href="challenges.html">Open</a></h2>'+(chs.length
+    ?chs.map(c=>'<div class="ch'+(c.claimed||c.progress>=c.target?" done":"")+'"><div class="t"><div>'+esc(c.title)+'</div><span>'+(c.claimed?"Claimed":c.progress>=c.target?"Ready to claim":"+"+c.xp+" XP")+'</span></div><div class="bar"><i style="width:'+Math.round(100*c.progress/c.target)+'%"></i></div></div>').join("")
+    :'<p class="empty">Challenges are not set up yet.</p>')+'</div>';
+  h+='<div class="card"><h2>Friends <a href="friends.html">Manage</a></h2>'+(fr.error
+    ?'<p class="empty">Friends are not set up yet.</p>'
+    :'<div class="stats"><div class="stat"><b>'+friendsN+'</b><span>Friends</span></div><div class="stat"><b>'+incoming+'</b><span>Requests waiting</span></div></div>'
+      +'<p style="margin:12px 0 0"><a class="btn alt sm" href="leaderboard.html">Friends leaderboard</a></p>')+'</div>';
+  h+='<div class="card wide"><h2>Continue playing</h2>'+(recentKeys.length
+    ?'<div class="tiles">'+recentKeys.slice(0,4).map(k=>tile(BYKEY[k],'Best '+best[k]+' &middot; '+plays[k]+' played')).join("")+'</div>'
+    :'<p class="empty">Nothing played yet. Pick a recommended game below.</p>')+'</div>';
+  h+='<div class="card wide"><h2>Recommended for you <a href="index.html#explore">All games</a></h2><div class="tiles">'+rec.map(g=>tile(g,esc(g.c)+(plays[keyOf(g)]?'':' &middot; New to you'))).join("")+'</div></div>';
+  h+='<div class="card"><h2>Your favourites</h2>'+(favs.length
+    ?'<div class="tiles" style="grid-template-columns:1fr">'+favs.slice(0,4).map(g=>g.u?tile(g,esc(g.c)):'<div class="tile"><span class="th" style="background:linear-gradient(135deg,'+g.g[0]+','+g.g[1]+')">'+g.i+'</span><span class="tx"><b>'+g.n+'</b><small>Coming soon</small></span></div>').join("")+'</div>'
+    :'<p class="empty">Tap the heart on any game to save it here.</p>')+'</div>';
+  h+='<div class="card"><h2>Recent achievements <a href="profile.html">All</a></h2>'+(recentAch.length
+    ?'<div class="ach">'+recentAch.map(a=>'<div><b>'+esc(a.name)+' &#10003;</b><small>'+esc(a.description)+' &middot; '+a.xp+' XP</small></div>').join("")+'</div>'
+    :'<p class="empty">No achievements yet. Save a score to unlock your first one.</p>')+'</div>';
+  const tried=Object.keys(plays).filter(k=>BYKEY[k]).length;
+  h+='<div class="card wide"><h2>Your stats <a href="profile.html">Profile</a></h2><div class="stats">'
+    +'<div class="stat"><b>'+total+'</b><span>Games finished</span></div><div class="stat"><b>'+tried+' / '+PLAY.length+'</b><span>Games tried</span></div>'
+    +PLAY.map(g=>'<div class="stat"><b>'+(best[keyOf(g)]||"-")+'</b><span>'+g.n+'</span></div>').join("")+'</div></div>';
+  h+='</div>';
+  $("main").innerHTML=h})();
+</script>
+</body>
+</html>

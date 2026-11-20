@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reset password | PLAYVORA</title>
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:440px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:980px}
+.top .sp{flex:1}
+.logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+h1{font:800 34px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:28px 0 6px}
+.lead{color:var(--mute);margin:0 0 20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+label{display:block;font-size:14px;color:var(--mute);margin:14px 0 6px}
+label:first-child{margin-top:0}
+input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:12px 14px;font:inherit}
+.btn{display:block;width:100%;margin-top:18px;border:0;border-radius:10px;padding:12px 18px;background:var(--accent);color:var(--on-accent);font:700 15px "DM Sans",sans-serif;cursor:pointer;text-align:center}
+.btn:hover{background:var(--accent-d)}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.msg{min-height:1.3em;margin:12px 0 0;font-size:14px;color:var(--mute)}.msg.bad{color:var(--accent)}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;max-width:980px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a><span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+</div></header>
+<main class="wrap">
+  <h1>Choose a new password</h1>
+  <p class="lead" id="lead">Checking your reset link...</p>
+  <form class="card" id="f" novalidate hidden>
+    <label for="p1">New password</label><input id="p1" type="password" autocomplete="new-password" placeholder="At least 6 characters">
+    <label for="p2">Confirm new password</label><input id="p2" type="password" autocomplete="new-password">
+    <button class="btn" id="go" type="submit">Save new password</button>
+    <p class="msg" id="msg" role="status"></p>
+  </form>
+  <div class="card" id="bad" hidden>
+    <p style="margin:0 0 4px" id="badmsg">This reset link is invalid or has expired.</p>
+    <a class="btn" href="login.html#forgot">Request a new link</a>
+  </div>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA</span><a href="index.html">Home</a></div></footer>
+<script>
+const $=id=>document.getElementById(id);
+let shown=false;
+$("tt").onclick=()=>PS.toggle();
+function say(t,bad){$("msg").textContent=t;$("msg").className="msg"+(bad?" bad":"")}
+function showForm(){if(shown)return;shown=true;$("lead").textContent="Pick something you will remember.";$("bad").hidden=true;$("f").hidden=false}
+function showBad(m){if(shown)return;$("lead").textContent="";if(m)$("badmsg").textContent=m;$("bad").hidden=false}
+if(!window.psdb){showBad("Could not reach PLAYVORA. Check your connection and refresh.")}
+else{
+  psdb.auth.onAuthStateChange((ev)=>{if(ev==="PASSWORD_RECOVERY")showForm()});
+  setTimeout(async()=>{if(shown)return;const u=await PSAuth.user();u?showForm():showBad()},2500)}
+$("f").onsubmit=async e=>{
+  e.preventDefault();
+  const a=$("p1").value,b=$("p2").value;
+  if(a.length<6)return say("Password needs at least 6 characters.",1);
+  if(a!==b)return say("The two passwords do not match.",1);
+  $("go").disabled=true;say("Saving...");
+  const r=await psdb.auth.updateUser({password:a});
+  if(r.error){$("go").disabled=false;return say(r.error.message,1)}
+  say("Password updated. Taking you to sign in...");
+  await psdb.auth.signOut();
+  setTimeout(()=>location.href="login.html?reset=1",1500)};
+</script>
+</body>
+</html>

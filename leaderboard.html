@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/supabase.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:1000px}
+.top a{color:var(--mute);font-size:14px}
+.top a:hover{color:var(--cream)}
+.top a.btn{color:var(--on-accent)}
+.top .sp{flex:1}
+.top .logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+h1{font:800 36px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:26px 0 6px}
+.lead{color:var(--mute);margin:0 0 22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.card h2{margin:0 0 14px;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:var(--mute)}
+label{display:block;font-size:14px;color:var(--mute);margin-bottom:6px}
+input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:12px 14px;font:inherit}
+.field{margin-bottom:14px}
+.btn{display:inline-block;border:0;border-radius:10px;padding:11px 20px;background:var(--accent);color:var(--on-accent);font:700 15px "DM Sans",sans-serif;cursor:pointer}
+.btn:hover{background:var(--accent-d)}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.alt:hover{border-color:var(--mute)}
+.btn.sm{padding:8px 16px;font-size:14px}
+.btn.full{width:100%}
+.seg{display:flex;gap:8px;margin-bottom:18px}
+.seg button{flex:1;background:var(--panel2);color:var(--cream);border:1px solid var(--line);border-radius:10px;padding:10px;font:600 14px "DM Sans",sans-serif;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.msg{min-height:1.4em;font-size:14px;margin:12px 0 0;color:var(--mute)}
+.msg.err{color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.stat{background:var(--panel2);border-radius:12px;padding:12px 14px}
+.stat b{display:block;font:800 28px "Bricolage Grotesque","Segoe UI",sans-serif}
+.stat span{color:var(--mute);font-size:13px}
+.av{width:56px;height:56px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 24px "Bricolage Grotesque","Segoe UI",sans-serif}
+.who{display:flex;gap:16px;align-items:center}
+.who h2{margin:0;font:800 24px "Bricolage Grotesque","Segoe UI",sans-serif;text-transform:none;letter-spacing:0;color:var(--cream)}
+.who p{margin:0;color:var(--mute);font-size:14px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--mute);font-weight:500;font-size:13px}
+tr.me td{background:var(--panel2);font-weight:700}
+.empty{color:var(--mute);padding:18px 0}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+.pl:hover{text-decoration:underline}
+</style>
+<title>Leaderboard | PLAYVORA</title>
+<script src="js/bell.js" defer></script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a>
+  <a href="index.html#explore">Explore</a><a href="leaderboard.html">Leaderboard</a><a href="settings.html">Settings</a>
+  <span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+  <a class="btn sm" id="who" href="login.html">Sign in</a>
+</div></header>
+<main class="wrap">
+  <h1>Leaderboard</h1>
+  <p class="lead">Top 10 players for each game. Your best score counts.</p>
+  <div class="seg" id="tabs" role="group" aria-label="Choose a game"></div>
+  <div class="seg" id="scope" role="group" aria-label="Who to show" style="display:none;margin:10px 0 0"><button data-s="all" aria-pressed="true">Everyone</button><button data-s="friends" aria-pressed="false">Friends</button></div>
+  <div class="card"><table>
+    <thead><tr><th style="width:60px">Rank</th><th>Player</th><th style="text-align:right">Score</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA &middot; Discover. Play. Compete.</span><a href="index.html">Home</a></div></footer>
+<script src="js/common.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let game=Object.keys(PSDB.GAMES)[0],me=null,scope="all";
+$("tabs").innerHTML=Object.keys(PSDB.GAMES).map(g=>'<button data-g="'+g+'" aria-pressed="false">'+PSDB.GAMES[g]+'</button>').join("");
+async function load(){
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===game));
+  $("rows").innerHTML='<tr><td colspan="3" class="empty">Loading...</td></tr>';
+  if(!PSDB.ready){$("rows").innerHTML='<tr><td colspan="3" class="empty">Can\'t reach the leaderboard right now.</td></tr>';return}
+  const r=scope==="friends"?await PSDB.sb.rpc("friends_leaderboard",{p_game:game}):await PSDB.top(game,10);
+  if(r.error){$("rows").innerHTML='<tr><td colspan="3" class="empty">Couldn\'t load scores. Have you run the setup SQL?</td></tr>';return}
+  const d=r.data||[];
+  $("rows").innerHTML=d.length?d.map((x,i)=>'<tr'+(me&&x.username===me?' class="me"':'')+'><td>'+(i+1)+'</td><td><a class="pl" href="player.html?u='+encodeURIComponent(x.username)+'">'+esc(x.username)+'</a></td><td style="text-align:right">'+x.score+'</td></tr>').join(""):'<tr><td colspan="3" class="empty">'+(scope==="friends"?"No scores from you or your friends yet. Add friends on the Friends page.":"No scores yet. Be the first!")+'</td></tr>'}
+$("scope").onclick=e=>{if(e.target.dataset.s){scope=e.target.dataset.s;document.querySelectorAll("#scope button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===scope));load()}};
+$("tabs").onclick=e=>{if(e.target.dataset.g){game=e.target.dataset.g;load()}};
+PSDB.profile().then(p=>{me=p&&p.username;if(p)$("scope").style.display="";load()});
+</script>
+</body>
+</html>

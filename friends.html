@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friends | PLAYVORA</title>
+<script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--panel2:#2d2250;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a;--accent-d:#ff7690;--on-accent:#1a0b14}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.55 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:980px}
+.top a:not(.btn){color:var(--mute);font-size:14px}.top a:not(.btn):hover{color:var(--cream)}
+.top .sp{flex:1}
+.logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream)!important}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+h1{font:800 36px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:26px 0 6px}
+.lead{color:var(--mute);margin:0 0 20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.card h2{margin:0 0 12px;font:800 20px "Bricolage Grotesque","Segoe UI",sans-serif}
+.card h2 small{font:500 14px "DM Sans",sans-serif;color:var(--mute)}
+.add{display:flex;gap:10px}
+input{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:11px 14px;font:inherit}
+.btn{display:inline-block;border:0;border-radius:10px;padding:10px 18px;background:var(--accent);color:var(--on-accent);font:700 14px "DM Sans",sans-serif;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--accent-d)}
+.btn.alt{background:var(--panel2);color:var(--cream);border:1px solid var(--line)}
+.btn.alt:hover{border-color:var(--mute)}
+.btn.sm{padding:7px 14px;font-size:13px}
+.p{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.p:first-of-type{border-top:0}
+.av{width:40px;height:40px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-weight:800;flex:none}
+.who{flex:1;min-width:0}
+.who b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who small{color:var(--mute)}
+.who a:hover b{text-decoration:underline}
+.acts{display:flex;gap:8px}
+.empty{color:var(--mute);margin:0;font-size:14px}
+.msg{min-height:1.3em;margin:10px 0 0;font-size:14px;color:var(--mute)}.msg.bad{color:var(--accent)}
+.note{background:var(--panel2);border-left:4px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--mute);margin-bottom:16px}
+.note a{color:var(--accent);text-decoration:underline}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:980px}
+</style>
+<script src="js/bell.js" defer></script>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a>
+  <a href="index.html#explore">Explore</a><a href="challenges.html">Challenges</a><a href="leaderboard.html">Leaderboard</a>
+  <span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+  <a class="btn sm" id="who" data-base="" href="login.html">Sign in</a>
+</div></header>
+
+<main class="wrap">
+  <h1>Friends</h1>
+  <p class="lead">Add players by username, then compete on a friends-only leaderboard.</p>
+
+  <div class="note" id="guest" hidden><a href="login.html?next=friends.html">Sign in</a> to add friends.</div>
+  <div class="note" id="setup" hidden>Friends are not set up yet. Run <b>supabase-friends.sql</b> in your Supabase SQL Editor, then refresh.</div>
+
+  <div id="app" hidden>
+    <div class="card">
+      <h2>Add a friend</h2>
+      <div class="add"><input id="u" maxlength="20" placeholder="Their username" autocomplete="off" aria-label="Friend's username"><button class="btn" id="send">Send request</button></div>
+      <p class="msg" id="msg" role="status"></p>
+    </div>
+    <div class="card" id="reqs" hidden><h2>Requests</h2><div id="reqlist"></div></div>
+    <div class="card"><h2>Your friends <small id="cnt"></small></h2><div id="friends"></div></div>
+    <p><a class="btn alt" href="leaderboard.html">Open the friends leaderboard</a></p>
+  </div>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA</span><span>Discover. Play. Compete.</span></div></footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+$("tt").onclick=()=>PS.toggle();
+function say(t,bad){$("msg").textContent=t;$("msg").className="msg"+(bad?" bad":"")}
+function person(x,acts){
+  const shown=x.display_name||x.username;
+  return '<div class="p"><div class="av" aria-hidden="true">'+esc(x.username[0].toUpperCase())+'</div><div class="who"><a href="player.html?u='+encodeURIComponent(x.username)+'"><b>'+esc(shown)+'</b></a><small>@'+esc(x.username)+' &middot; Level '+(x.level||1)+'</small></div><div class="acts">'+acts+'</div></div>'}
+const btn=(a,id,t,alt)=>'<button class="btn sm'+(alt?' alt':'')+'" data-a="'+a+'" data-id="'+id+'">'+t+'</button>';
+
+async function load(){
+  const r=await psdb.rpc("my_friends");
+  if(r.error){$("app").hidden=true;$("setup").hidden=false;return}
+  $("app").hidden=false;
+  const d=r.data||[],fr=d.filter(x=>x.relation==="friend"),inc=d.filter(x=>x.relation==="incoming"),out=d.filter(x=>x.relation==="outgoing");
+  $("reqs").hidden=!(inc.length||out.length);
+  $("reqlist").innerHTML=inc.map(x=>person(x,btn("accept",x.friendship_id,"Accept")+btn("decline",x.friendship_id,"Decline",1))).join("")
+    +out.map(x=>person(x,'<small style="color:var(--mute)">Waiting</small>'+btn("remove",x.friendship_id,"Cancel",1))).join("");
+  $("cnt").textContent=fr.length?"("+fr.length+")":"";
+  $("friends").innerHTML=fr.length?fr.map(x=>person(x,btn("remove",x.friendship_id,"Remove",1))).join(""):'<p class="empty">No friends yet. Send a request above.</p>'}
+
+$("send").onclick=async()=>{
+  const v=$("u").value.trim().toLowerCase();
+  if(!v)return say("Enter a username.",1);
+  $("send").disabled=true;
+  const r=await psdb.rpc("send_friend_request",{p_username:v});
+  $("send").disabled=false;
+  if(r.error)return say(r.error.message,1);
+  say(r.data==="accepted"?"You are now friends with "+v+".":"Request sent to "+v+".");
+  $("u").value="";load()};
+$("u").onkeydown=e=>{if(e.key==="Enter")$("send").click()};
+$("app").onclick=async e=>{
+  const a=e.target.dataset.a;if(!a)return;
+  e.target.disabled=true;
+  const id=+e.target.dataset.id;
+  const r=a==="remove"?await psdb.rpc("remove_friendship",{p_id:id}):await psdb.rpc("respond_friend",{p_id:id,p_accept:a==="accept"});
+  if(r.error)say(r.error.message,1);
+  load()};
+
+(async()=>{
+  if(!window.psdb){$("guest").textContent="Could not reach PLAYVORA. Check your connection and refresh.";$("guest").hidden=false;return}
+  PSAuth.nav($("who"));
+  const u=await PSAuth.user();
+  if(!u){$("guest").hidden=false;return}
+  load()})();
+</script>
+</body>
+</html>

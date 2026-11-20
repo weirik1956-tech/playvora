@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy | PLAYVORA</title>
+<script src="js/theme.js"></script>
+<script src="js/config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#17112b;--panel:#231a3d;--line:#3a2d63;--cream:#f3ecff;--mute:#a99dcb;--accent:#ff5a7a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--cream);font:16px/1.65 "DM Sans",system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--accent);text-decoration:underline}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px;width:100%}
+.top{border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:18px;height:64px;max-width:980px}
+.top .sp{flex:1}
+.logo{font:800 22px "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:1px;color:var(--cream);text-decoration:none}
+.icon{background:var(--panel);border:1px solid var(--line);color:var(--cream);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+h1{font:800 clamp(32px,5vw,44px) "Bricolage Grotesque","Segoe UI",sans-serif;letter-spacing:-1px;margin:30px 0 4px}
+.upd{color:var(--mute);margin:0 0 22px;font-size:14px}
+h2{font:800 20px "Bricolage Grotesque","Segoe UI",sans-serif;margin:26px 0 6px}
+p,li{color:var(--cream)}
+li{margin:4px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:6px 24px 22px;margin-bottom:24px}
+footer{margin-top:auto;border-top:1px solid var(--line);padding:22px 0;color:var(--mute);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;max-width:980px}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="logo" href="index.html">PLAYVORA</a><span class="sp"></span>
+  <button class="icon" id="tt" aria-label="Toggle light or dark mode" title="Toggle theme">&#9680;</button>
+</div></header>
+<main class="wrap">
+  <h1>Privacy Policy</h1>
+  <p class="upd">Last updated 4 November 2026</p>
+  <div class="card">
+    <h2>What we collect</h2>
+    <ul>
+      <li><b>Account details:</b> your email address and a username. Your password is handled by our authentication provider and is stored in scrambled form, so we never see it.</li>
+      <li><b>Profile details you choose to add:</b> display name, bio, status and favourite genres.</li>
+      <li><b>Activity on PLAYVORA:</b> your game scores, XP and level, achievements, favourite games, reviews and ratings, friends and friend requests, challenge progress and notifications.</li>
+      <li><b>Settings on your device:</b> your theme, accent colour and accessibility choices, and your sign-in session, are kept in your browser's local storage. We do not use advertising or tracking cookies.</li>
+    </ul>
+    <h2>How we use it</h2>
+    <p>We use your information to run your account, save your progress, show leaderboards and profiles, send in-site notifications, and keep the platform fair and safe. We do not sell your data and we do not show ads.</p>
+    <h2>What other players can see</h2>
+    <ul>
+      <li>Your username, level and best scores appear on leaderboards and your player page.</li>
+      <li>Your reviews show your username.</li>
+      <li>Your display name, bio, status and favourite genres are shown only if your profile is public. You can change this in Settings, under Privacy.</li>
+      <li>Your email address is never shown to other players.</li>
+    </ul>
+    <h2>Services we rely on</h2>
+    <p>PLAYVORA stores accounts and data with Supabase and is hosted on Vercel. Your browser also loads fonts from Google Fonts and code libraries from the jsDelivr network, which means those providers can see your IP address when a page loads.</p>
+    <h2>Your choices</h2>
+    <ul>
+      <li>Edit your profile, username, email and password in Settings.</li>
+      <li>Sign out of every device from Settings, under Account.</li>
+      <li>To see, correct or delete your data, or to have your account removed, contact us using the details below.</li>
+    </ul>
+    <h2>Children</h2>
+    <p>PLAYVORA is not meant for children under 13, and we do not knowingly collect their information.</p>
+    <h2>Changes</h2>
+    <p>If we change how we handle data, we will update this page and its date.</p>
+    <h2>Contact</h2>
+    <p id="contact">Questions about this page? Contact the PLAYVORA administrator through the site.</p>
+  </div>
+</main>
+<footer><div class="wrap"><span>&copy; 2026 PLAYVORA</span><span><a href="terms.html">Terms</a> &middot; <a href="privacy.html">Privacy</a> &middot; <a href="index.html">Home</a></span></div></footer>
+<script>
+document.getElementById("tt").onclick=()=>PS.toggle();
+const c=window.PV_CONFIG&&PV_CONFIG.contactEmail;
+if(c&&/^[^\s@<>"]+@[^\s@<>"]+$/.test(c)){const a=document.createElement("a");a.href="mailto:"+c;a.textContent=c;const p=document.getElementById("contact");p.textContent="Questions about this page? Email ";p.appendChild(a);p.append(".")}
+</script>
+</body>
+</html>
